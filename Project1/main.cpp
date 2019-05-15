@@ -193,7 +193,7 @@ int main(int argc, char **argv) {
 	null_edge_list = vector<Edge *>();
 	init_hourglass_val();
 
-	if (read_file("input/input5.txt") == -1) return 0;
+	if (read_file("input/input3.txt") == -1) return 0;
 
 	vector<int> polygon = vector<int>(point_list.size());
 	iota(polygon.begin(), polygon.end(), 0);
