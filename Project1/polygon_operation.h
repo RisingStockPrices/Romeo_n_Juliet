@@ -29,7 +29,7 @@ point_type dist(int p1, int p2) {
 	return sqrt(pow(diff_x, 2) + pow(diff_y, 2));
 }
 
-double calculate_angle(int origin, int target) {
+double calculate_angle(int origin, int target) { //target-origin vector가 x축과 이루는 각을 알려주는 것 가타요....
 	point_type x = point_list[target].get_x() - point_list[origin].get_x();
 	point_type y = point_list[target].get_y() - point_list[origin].get_y();
 	return atan2(y, x);
@@ -153,7 +153,7 @@ bool is_right(int p0, int p1, int p2)
 #define above(P,Vi,Vj)  (isLeft(P,Vi,Vj) >= 0)   // true if Vi is above Vj
 #define below(P,Vi,Vj)  (isLeft(P,Vi,Vj) <= 0)   // true if Vi is below Vj
 //===================================================================
-//고쳐야 함
+//고쳐야 함...ㅜㅜㅜㅜㅜㅜㅜ
 void seperate_polygon_with_edge(vector<vector<int>>& polygon_list_with_edge, int e_num) {
 	Edge e = diagonal_list[e_num];
 	for (int j = 0; j < int(polygon_list_with_edge.size()); j++) {
@@ -426,7 +426,7 @@ vector<Edge> find_monotone_polygon(vector<int>& polygon, bool reverse) {
 		int pointID = point_set[i].get_pointID();
 		int polygonID = point_set[i].get_polygonID();
 
-		int left_PointID = get_left_vertex(polygon, polygonID);
+		int left_PointID = get_left_vertex(polygon, polygonID);//화면상의 left right이랑 반대로 들어가는뎅(input6.txt에서)
 		int right_PointID = get_right_vertex(polygon, polygonID);
 
 		Point vertex = point_list[pointID];
@@ -438,8 +438,8 @@ vector<Edge> find_monotone_polygon(vector<int>& polygon, bool reverse) {
 		point_type e1 = calculate_angle(pointID, left_PointID, reverse);
 		point_type e2 = calculate_angle(pointID, right_PointID, reverse);
 		if (e1 < 0) e1 = e1 + 2 * PI;
-		if (e2 < 0) e2 = e2 + 2 * PI;
-		if (e1 > e2) swap(e1, e2);
+		if (e2 < 0) e2 = e2 + 2 * PI;//무조건 x축 양의 방향 기준으로 오게 함
+		if (e1 > e2) swap(e1, e2);//e2이 더 큰 값 가지게
 
 		//straight line
 		if (abs(e1 - 0) < absTolerance && abs(e2 - PI) < absTolerance) break;
@@ -490,7 +490,7 @@ vector<Edge> find_monotone_polygon(vector<int>& polygon, bool reverse) {
 
 	return diagonal_list;
 }
-vector<Edge> find_monotone_polygons(vector<vector<int>>& polygon_list)
+vector<Edge> find_monotone_polygons(vector<vector<int>>& polygon_list)//논문 3장 내용 (strictly increasing depth)
 {
 	vector<Edge> diagonal_list;
 	vector<vector<int>> new_polygon_list;
@@ -512,7 +512,7 @@ void make_big_triangle() {
 	vector<VertexID> point_id_list = vector<VertexID>(point_list.size());
 	for (int i = 0; i < int(point_list.size()); i++)
 		point_id_list[i] = VertexID(i, i);
-	sort(point_id_list.begin(), point_id_list.end(), y_UPDOWN_comp);
+	sort(point_id_list.begin(), point_id_list.end(), y_UPDOWN_comp);//y좌표 큰 순서대로 sort함
 
 	int top = point_id_list.begin()->get_pointID();
 	int bottom = (point_id_list.end() - 1)->get_pointID();

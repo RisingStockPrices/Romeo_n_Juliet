@@ -28,6 +28,11 @@ int d_size;
 Hourglass final_hour;
 PointS point_state;
 
+////////////////////
+vector<Point> polygon_boundary;
+////////////////////
+
+
 point_type max_y;
 point_type min_y;
 point_type max_x;
@@ -183,6 +188,7 @@ void free_data() {
 
 int main(int argc, char **argv) {
 
+
 	// initialization
 	polygon_list = vector<vector<int>>();
 	diagonal_list = vector<Edge>();
@@ -193,18 +199,19 @@ int main(int argc, char **argv) {
 	null_edge_list = vector<Edge *>();
 	init_hourglass_val();
 
-	if (read_file("input/input3.txt") == -1) return 0;
+	if (read_file("input/input7.txt") == -1) return 0;
 
 	vector<int> polygon = vector<int>(point_list.size());
+
 	iota(polygon.begin(), polygon.end(), 0);
 	polygon_list.push_back(polygon);
-	make_big_triangle();
+	make_big_triangle(); //여기서 point list에 의문의 점 3개가 더 추가됨
 
 	for (int i = 0; i < (int)point_list.size(); i++) {
 		outer_edge_list.push_back(Edge(i, (i + 1) % point_list.size()));
 	}
 	bool  inside = true;
-	vector<Edge> new_d_list(find_monotone_polygons(polygon_list));
+	vector<Edge> new_d_list(find_monotone_polygons(polygon_list));//divides P into smaller polygons(not necessarily triangles) -> 아직 test point 안 잡음
 	diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
 	new_d_list = find_monotone_polygons(outer_polygon_list);
 	outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
@@ -405,18 +412,29 @@ void display() {
 		glVertex2d(point_list[i].get_x(), point_list[i].get_y());
 	glEnd();
 
-	glLineWidth(3);
+	//show the 3 weird points
+	glColor3f(1, 1, 0);
+	glBegin(GL_LINE_LOOP);
+	for (int i = v_num ; i < v_num + 3; i++)
+	{
+		glVertex2d(point_list[i].get_x(), point_list[i].get_y());
+	}
+	glEnd();
+
+
+
+	glLineWidth(3);//every diagonal
 	glColor3f(float(0.6), float(0.6), float(0.6));
 	for (int i = 0; i < (int)(diagonal_list.size()); i++) {;
 		display_edge(diagonal_list[i]);
 	}
 	
-	glColor3f(1.0f, 0.0f, 1.0f);
+	glColor3f(1.0f, 0.0f, 1.0f);//principle diagonals?? -diags it's separating
 	for (int i = 0; i < (int)sequence_diagonal.size(); i++) {
 		display_edge(diagonal_list[sequence_diagonal[i]]);
 	}
 	
-	//>>
+	
 	
 	glColor3d(0, 0.47, 0.43);
 	for (int t = 0; t <(int)test_points.size(); t++) {
@@ -510,6 +528,7 @@ int read_file(const string filePath) {
 		while (openFile >> x >> y) {
 			Point p = Point(id, x, y);
 			point_list.push_back(p);
+			polygon_boundary.push_back(p);
 			id++;
 		}
 		openFile.close();
