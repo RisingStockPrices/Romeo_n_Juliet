@@ -257,7 +257,7 @@ bool valid_check(Chain * left_upper_chain, Chain * right_upper_chain, Chain * le
 
 	return true;
 }
-bool compute_outer_tangent(Chain* lu, Chain *ru, int * t1, int *t2, Edge * common_edge, Chain * ld = NULL, Chain * rd = NULL) {
+ bool compute_outer_tangent(Chain* lu, Chain *ru, int * t1, int *t2, Edge * common_edge, Chain * ld = NULL, Chain * rd = NULL) {
 	vector<int> p1_list = lu->get_point_list();
 	vector<int> p2_list = ru->get_point_list();
 	point_type min = -1;
@@ -286,6 +286,7 @@ bool compute_outer_tangent(Chain* lu, Chain *ru, int * t1, int *t2, Edge * commo
 		*t2 = (idx - idx_diff);*/
 	}else if (p2_list.size() == 1) {
 		int idx = -1, idx_diff = -1;
+
 		if (common_edge->check_same_point(p1_list.front()) == -1) {
 			idx = 0;
 			idx_diff = 1;
@@ -295,15 +296,15 @@ bool compute_outer_tangent(Chain* lu, Chain *ru, int * t1, int *t2, Edge * commo
 			idx_diff = -1;
 		}
 		while (idx >= 0 && idx < (int)p1_list.size()) {
-			if(side_check(lu,ru,ld,rd,p1_list[idx],p2_list[0],common_edge)){
+			if(side_check(lu,ru,ld,rd,p1_list[idx],p2_list[0],common_edge)){/////////////////////이거 만족 안 하면 t1값이 안정해진 대로 valid_check(?)함
 				*t1 = idx;
 				*t2 = 0;
 				break;
 			}
 			idx += idx_diff;
 		}
-		/**t1 = (idx - idx_diff);
-		*t2 = 0;*/
+		//*t1 = (idx - idx_diff);
+		//*t2 = 0;
 	}/*else if (p1_list.size() == 2 && (int)p2_list.size() == 2) {
 		int p1_com = -1, p2_com = -1;
 		int p1_diff = -1, p2_diff = -1;

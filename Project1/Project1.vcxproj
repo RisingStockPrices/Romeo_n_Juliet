@@ -149,8 +149,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Chain.h" />
-    <ClInclude Include="common_tangent.h" />
-    <ClInclude Include="DataT.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="Hourglass.h" />
     <ClInclude Include="NODE.h" />

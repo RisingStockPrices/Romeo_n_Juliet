@@ -23,12 +23,6 @@
     <ClInclude Include="Chain.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="common_tangent.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DataT.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Edge.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>

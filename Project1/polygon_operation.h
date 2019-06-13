@@ -408,7 +408,7 @@ vector<Edge> triangulate_monotone_polygons(vector<vector<int>>& polygon_list) {
 	polygon_list.swap(new_polygon_list);
 	return diagonal_list;
 }
-vector<Edge> find_monotone_polygon(vector<int>& polygon, bool reverse) {
+vector<Edge> find_monotone_polygon(vector<int>& polygon, bool reverse) {//goal is to return list of diagonals
 
 	bool(*fp)(VertexID, VertexID);
 	fp = reverse ? y_DOWNUP_comp : y_UPDOWN_comp;

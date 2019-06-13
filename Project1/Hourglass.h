@@ -420,7 +420,7 @@ Hourglass construct_hourglass_point(int p, int high) {
 	Edge e(p);
 	diagonal_list.push_back(e);
 	//hourglass_list.push_back(Hourglass(diagonal_list.size()-1, high));
-	return Hourglass(diagonal_list.size() - 1, high);
+	return Hourglass(diagonal_list.size() - 1, high);//방금 추가한 point edge 로 funnel? 만드는 셈
 }
 int construct_hourglass(int low, int high) {
 	
