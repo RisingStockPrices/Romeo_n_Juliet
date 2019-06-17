@@ -261,7 +261,7 @@ bool valid_check(Chain * left_upper_chain, Chain * right_upper_chain, Chain * le
 	vector<int> p1_list = lu->get_point_list();
 	vector<int> p2_list = ru->get_point_list();
 	point_type min = -1;
-	if (p1_list.size() == 1 && p2_list.size() == 1) {
+	if (p1_list.size() == 1 && p2_list.size() == 1) {//left_upper 이랑 right_upper chain가 single point로만 구성돼있으면 (당근) idx는 0이어야게쮜
 		*t1 = 0;
 		*t2 = 0;
 	}else if (p1_list.size() == 1) {
@@ -331,7 +331,7 @@ bool valid_check(Chain * left_upper_chain, Chain * right_upper_chain, Chain * le
 			*t1 = p1_com;
 			*t2 = p2_com;			
 		}
-	}*/else if (p1_list.size() == 2) {
+	}*/else if (p1_list.size() == 2) { //여기서 vector iterator+ offset 문제 뜸 ////////////////////////////////////////////////////////////////////////
 		if (p1_list.front() == p2_list.front() || p1_list.front() == p2_list.back()) {
 			*t1 = 1;
 		}

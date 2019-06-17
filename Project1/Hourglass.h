@@ -597,7 +597,7 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 	
 	int common_edge_check[2];
 
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 2; i++) {//두 hourglass가 공유하는 edge 찾아서 common_edge_check에 index저장
 		for (int j = 0; j < 2; j++) {
 			if (left_edge_list[i] == right_edge_list[j]) {
 				common_edge_check[0] = i;
@@ -606,6 +606,8 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 			}
 		}
 	}
+
+	//printf("%d %d\n", common_edge_check[0], common_edge_check[1]);
 	Hourglass new_hourglass;
 	
 	if (!left_openess && !right_openess) {
@@ -679,13 +681,14 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 			r_val = concatenate_two_funnels_oc(_left.get_second_chain(), _right.get_first_chain(), common_edge, _left.get_apaxes()[1], new_hourglass.get_second_edge());
 			new_hourglass.set_apax(_left.get_apaxes()[1], 1);
 		}
-		if (r_val.new_string != NULL) {
+ 		if (r_val.new_string != NULL) {
 			new_hourglass.set_string(new String(_left.get_string(), r_val.new_string));
 			new_hourglass.set_apax(r_val.apax, 1);
 		}
 		new_hourglass.set_second_chain(r_val.chain);
 		
-	}else if (left_openess && !right_openess) {
+	}
+	else if (left_openess && !right_openess) {
 		new_hourglass.set_string(_right.get_string());
 		if (common_edge_check[0] == 0) {
 			new_hourglass.set_first_edge(left_edge_list[1]);
@@ -714,16 +717,17 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 			new_hourglass.set_apax(r_val.apax, 0);
 		}
 		new_hourglass.set_first_chain(r_val.chain);
-	}else {
+	}
+	else {//two open hourglasses-> could be open or closed
 		//set first_edge and second edge
-		if (common_edge_check[0] == 0) {
-			new_hourglass.set_first_edge(left_edge_list[1]);
+		if (common_edge_check[0] == 0) {//0번째 edge가 common일때
+			new_hourglass.set_first_edge(left_edge_list[1]);//common아닌 애를 new H의 first edge로 만든다
 		}
 		else {
-			new_hourglass.set_first_edge(left_edge_list[0]);
+			new_hourglass.set_first_edge(left_edge_list[0]);//left의 common아닌 edge를 newH의 first edge로 만든다.
 		}
 		if (common_edge_check[1] == 0) {
-			new_hourglass.set_second_edge(right_edge_list[1]);
+			new_hourglass.set_second_edge(right_edge_list[1]);//right H의 common 아닌 edge를 new H의 second edge로 만든다
 		}
 		else {
 			new_hourglass.set_second_edge(right_edge_list[0]);
@@ -734,19 +738,26 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 		int outer_chain[2][2];
 		int p1 = common_edge->get_origin();
 		
+		//left[0] -> first chain of _left
+		//left[1] -> second chain of _left
+		//right[0] -> first chain of _right
+		//right[1] -> second chain of _right
+
 		if ((left[0]->check_inclusive(p1) && left[1]->check_inclusive(p1)) || (right[0]->check_inclusive(p1) && right[1]->check_inclusive(p1))){
-			p1 = common_edge->get_dest();
+			p1 = common_edge->get_dest();//left chain의 first/second chain의 point list 확인해서 p1(common_edge의 origin)이 둘다 포함돼있는지, right chain에 대해서도 똑같이 확인
+			//둘 중 하나라도 만족하면? p1 은 이제 common_edge의 destination값을 가지게 됨.
+			//만족을 하면...?funnel 이라는 말 아닌가
 		}
-		vector<int> left_0_point_list = left[0]->get_point_list();
-		if (left_0_point_list.front() == p1 || left_0_point_list.back() == p1) {
-			outer_chain[0][0] = 0;//= left[0]
+		vector<int> left_0_point_list = left[0]->get_point_list();//list of points in first chain of _left
+		if (left_0_point_list.front() == p1 || left_0_point_list.back() == p1) {//if first chain of _left either start or end with p1
+			outer_chain[0][0] = 0;//= left[0] -> set outer first outer chain 
 			outer_chain[1][0] = 1;// left[1];
 		}
 		else {
 			outer_chain[1][0] = 0;// left[0];
 			outer_chain[0][0] = 1;// left[1];
 		}
-		vector<int> right_0_point_list = right[0]->get_point_list();
+		vector<int> right_0_point_list = right[0]->get_point_list();//list of points in first chain of _right
 		if (right_0_point_list.front() == p1 || right_0_point_list.back() == p1) {
 			outer_chain[0][1] = 0;// right[0];
 			outer_chain[1][1] = 1;// right[1];
@@ -761,7 +772,7 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 		bool check = true;
 		Chain *left_c_list[2];
 		Chain *right_c_list[2];
-		int apax[2][2];
+		int apex[2][2];
 		for (int i = 0; i < 2; i++) {
 			Chain * left_upper_chain = left[outer_chain[i][0]];
 			Chain * right_upper_chain = right[outer_chain[i][1]];
@@ -770,11 +781,11 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 			int t1, t2;
 			bool valid = compute_outer_tangent(left_upper_chain, right_upper_chain, &t1, &t2, common_edge, left_down_chain, right_down_chain);
 			
-			if (valid) {
-				apax[i][0] = left_upper_chain->get_point(t1);
-				left_c_list[i] = left_upper_chain->cutting_chain(common_edge, apax[i][0],left_upper_chain);
-				apax[i][1] = right_upper_chain->get_point(t2);
-				right_c_list[i] = right_upper_chain->cutting_chain(common_edge, apax[i][1], right_upper_chain);
+			if (valid) {//set apex and left & right c_lists for the upcoming new chain!
+				apex[i][0] = left_upper_chain->get_point(t1); //left_upper_chain의 c_point_list 에서 index가 't1'인 element를 return 함
+				left_c_list[i] = left_upper_chain->cutting_chain(common_edge, apex[i][0],left_upper_chain);
+				apex[i][1] = right_upper_chain->get_point(t2);
+				right_c_list[i] = right_upper_chain->cutting_chain(common_edge, apex[i][1], right_upper_chain);
 			}
 			else {
 				check = false;
@@ -785,8 +796,8 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 			for (int i = 0; i < 2; i++) {
 				Chain * c1 = left_c_list[i];
 				Chain * c2 = right_c_list[i];
-				int p1 = apax[i][0];
-				int p2 = apax[i][1];
+				int p1 = apex[i][0];
+				int p2 = apex[i][1];
 				new_chain[i] = new Chain(c1, c2, p1, p2);
 			}
 			new_hourglass.set_first_chain(new_chain);

@@ -126,7 +126,7 @@ isLeft(int p0, int p1, int p2)
 	return (P1.get_x() - P0.get_x())*(P2.get_y() - P0.get_y()) - (P2.get_x() - P0.get_x())*(P1.get_y() - P0.get_y());
 }
 
-bool is_left(int p0, int p1, int p2)
+bool is_left(int p0, int p1, int p2)// p1p2기준 p0가 left side에 있다., cf. cross product, determinant
 {
 	Point P0 = point_list[p0];
 	Point P1 = point_list[p1];
@@ -136,7 +136,7 @@ bool is_left(int p0, int p1, int p2)
 		return true;
 	else return false;
 }
-bool is_right(int p0, int p1, int p2)
+bool is_right(int p0, int p1, int p2)//p1p2기준 p0가 right side 에 있다
 {
 	Point P0 = point_list[p0];
 	Point P1 = point_list[p1];

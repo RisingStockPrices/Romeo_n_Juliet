@@ -115,21 +115,21 @@ public:
 	vector<int> get_point_list() {
 		return c_point_list;
 	}
-	int check_one_side(int inner_point, int outter_point, Edge * common_edge) {
+	int check_one_side(int inner_point, int outer_point, Edge * common_edge) {
 	
 		int p1 = -1;
 		if (check_inclusive(inner_point)) {
 			p1 = inner_point;
 		}
-		else if(check_inclusive(outter_point)){
-			p1 = outter_point;
+		else if(check_inclusive(outer_point)){
+			p1 = outer_point;
 		}
 		int idx = -1, diff_idx = -1;
-		if (common_edge->get_origin() == c_point_list[0] || common_edge->get_dest() == c_point_list[0]) {
+		if (common_edge->get_origin() == c_point_list[0] || common_edge->get_dest() == c_point_list[0]) {//c_point의 첫 element랑 겹치는 게 없는지 확인
 			idx = 0;
 			diff_idx = 1;
 		}
-		else {
+		else {//없으면 c_point_list의 뒤에서부터 idx주고 diff_idx는 -1이된다
 			idx = c_point_list.size() - 1;
 			diff_idx = -1;
 		}
@@ -137,9 +137,9 @@ public:
 		int num = 0;
 		while (idx >= 0 && idx < (int)c_point_list.size() && c_point_list[idx] != p1) {
 			num++;
-			if (is_left(c_point_list[idx], inner_point, outter_point))
+			if (is_left(c_point_list[idx], inner_point, outer_point))
 				n++;
-			if (is_right(c_point_list[idx], inner_point, outter_point))
+			if (is_right(c_point_list[idx], inner_point, outer_point))
 				m++;
 			idx += diff_idx;
 		}
@@ -161,9 +161,9 @@ public:
 		num = n = m = 0;
 		while (idx >= 0 && idx < (int)c_point_list.size()) {
 			num++;
-			if (is_left(c_point_list[idx], inner_point, outter_point))
+			if (is_left(c_point_list[idx], inner_point, outer_point))
 				n++;
-			if (is_right(c_point_list[idx], inner_point, outter_point))
+			if (is_right(c_point_list[idx], inner_point, outer_point))
 				m++;
 			idx += diff_idx;
 		}
@@ -200,16 +200,16 @@ public:
 			if (is_right(c_point_list[i], p1, p2))
 				m++;
 		}
-		if (m == (int)c_point_list.size() && n == (int)c_point_list.size()) {
+		if (m == (int)c_point_list.size() && n == (int)c_point_list.size()) {//c_point_list의 모든 점이 p1p2 벡터와 일직선상에 있었을 때(is left와 is_right모두 만족)
 			return 3;
 		}
-		else if (m == (int)c_point_list.size()) {
+		else if (m == (int)c_point_list.size()) {//p1p2기준 c_point 상의 점이 모두 right side에 있었다
 			return 2;
 		}
-		else if (n == (int)c_point_list.size()) {
+		else if (n == (int)c_point_list.size()) {//chain을 구성하는 모든 점들이 p1p2의 left side에 있더라
 			return 1;
 		}
-		else return 0;
+		else return 0;//이도 저도 아니다 (어중간)
 	}
 	vector<int> cutting_c_point_list(Edge * common_chain, int idx, bool first) {
 		vector<int> new_v;
