@@ -116,7 +116,7 @@ public:
 		return c_point_list;
 	}
 	int check_one_side(int inner_point, int outer_point, Edge * common_edge) {
-	
+	//common edge는...음 딱 한 번 필요함(idx 초기 값 설정할 때)
 		int p1 = -1;
 		if (check_inclusive(inner_point)) {
 			p1 = inner_point;
@@ -125,7 +125,8 @@ public:
 			p1 = outer_point;
 		}
 		int idx = -1, diff_idx = -1;
-		if (common_edge->get_origin() == c_point_list[0] || common_edge->get_dest() == c_point_list[0]) {//c_point의 첫 element랑 겹치는 게 없는지 확인
+		if (common_edge->get_origin() == c_point_list[0] || common_edge->get_dest() == c_point_list[0]) {
+			//c_point의 첫 element랑 겹치는 게 없는지 확인
 			idx = 0;
 			diff_idx = 1;
 		}
@@ -135,7 +136,7 @@ public:
 		}
 		int n = 0, m = 0;
 		int num = 0;
-		while (idx >= 0 && idx < (int)c_point_list.size() && c_point_list[idx] != p1) {
+		while (idx >= 0 && idx < (int)c_point_list.size() && c_point_list[idx] != p1) {//inner, outer point가 나오면 중단
 			num++;
 			if (is_left(c_point_list[idx], inner_point, outer_point))
 				n++;
@@ -144,16 +145,16 @@ public:
 			idx += diff_idx;
 		}
 		int r1 = -1;
-		if (m == 0 && n == 0) {
+		if (m == 0 && n == 0) {//while loop 한 번도 안 돌 경우, 예를들어 common edge 포인트가 inner일때
 			r1 = 3;
 		}
-		if (m == num && n == num) {
+		else if (m == num && n == num) {//else if 가 아니고..??//////////////////////
 			r1 = 3;
 		}
-		else if (m == num) {
+		else if (m == num) {//다 right side
 			r1 = 2;
 		}
-		else if (n == num) {
+		else if (n == num) {//다 left side
 			r1 = 1;
 		}
 		else r1 = 0;
@@ -242,9 +243,10 @@ public:
 	bool check_enable_line(int p1, int p2, Edge * common_edge, Chain * c1) {
 
 		int check_side = c1->check_one_side(p1, p2, common_edge);
-		if (check_side == 0) return false;
+		if (check_side == 0) return false;//common_edge기준 p1과 p2가 같은 side에 있지 않을때..?
 		
 		return true;
+		//여기까지는 닿지도 않...지??
 		bool check = check_line_intersection(p1, p2, common_edge->get_origin(), common_edge->get_dest());
 		if (check) return true;
 		
@@ -258,7 +260,7 @@ public:
 	}
 	Chain* cutting_chain(Edge * common_edge, int apax, Chain * c1) {
 		int index = -1;
-		if (common_edge->check_same_point(c_point_list.front()) == -1) {
+		if (common_edge->check_same_point(c_point_list.front()) == -1) {//c_point[0]이 common edge를 이루는 vertex가 아닐때
 			for (int k = 0; k < (int)c_point_list.size(); k++) {
 				bool check1 = true;
 				check1 = check_enable_line(apax, c_point_list[k], common_edge, c1);//c1->check_one_side(apax, c_point_list[k], common_edge);
