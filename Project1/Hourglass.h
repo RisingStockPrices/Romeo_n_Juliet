@@ -590,6 +590,40 @@ Hourglass concatenate_hourglasses(int h1, int h2) {
 }
 
 
+Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
+{
+	Hourglass newHourglass;
+	
+	Edge* leftEdgeList = _left.get_edge_list();
+	Edge* rightEdgeList = _right.get_edge_list();
+	Edge commonEdge;
+	int leftCommonEdgeIndex = 0 , rightCommonEdgeIndex = 0;
+
+	for (int i = 0; i < 2; i++) //두 edge 모두 같은 경우는 없다고 가정함니다.
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			if (leftEdgeList[i]==rightEdgeList[j]){
+				leftCommonEdgeIndex = i;
+				rightCommonEdgeIndex = j;
+				commonEdge = Edge(leftEdgeList[i].get_origin(),leftEdgeList[i].get_dest());
+				break;
+			}
+		}
+	}
+
+	//set upper and lower chain (left and right should be the same) -> common edge기준으로 하는 것이 어떨까? id가 큰 애랑 닿아있는 애를 샤바샤바
+
+
+	//left hourglass의 common하지 않은 edge를 first edge로 set함!! -> 이 순서가 중요한가?
+	newHourglass.set_first_edge(leftEdgeList[leftCommonEdgeIndex?0:1]);
+	newHourglass.set_second_edge(rightEdgeList[rightCommonEdgeIndex?0:1]);
+
+	return newHourglass;
+}
+
+
+
 Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 	 
 	bool left_openess = _left.check_openess();
@@ -597,8 +631,9 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 	Edge* left_edge_list = _left.get_edge_list();
 	Edge* right_edge_list = _right.get_edge_list();
 	
-	printf("dealing with hourglasses %d %d\n", _left.get_id(), _right.get_id());
-	printf("%d %d\n", left_openess, right_openess);
+	concatenateOpenOpen(_left, _right);/////////////////////////////////////debugging용도임니다.
+	//printf("dealing with hourglasses %d %d\n", _left.get_id(), _right.get_id());
+	//printf("%d %d\n", left_openess, right_openess);
 	int common_edge_check[2];
 
 	for (int i = 0; i < 2; i++) {//두 hourglass가 공유하는 edge 찾아서 common_edge_check에 index저장

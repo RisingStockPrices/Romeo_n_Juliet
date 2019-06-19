@@ -42,6 +42,7 @@ public:
 		len = (point_type)sqrt(((p1.get_x() - p2.get_x())*(p1.get_x() - p2.get_x()))
 			+ ((p1.get_y() - p2.get_y())*(p1.get_y() - p2.get_y())));
 	}
+	
 	bool is_point() {
 		if (origin == dest) {
 			return true;
