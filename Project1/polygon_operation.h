@@ -85,6 +85,7 @@ Edge get_edge(int d_num) {
 	return d_num >= d_size ? outer_edge_list[d_num - d_size] : diagonal_list[d_num];
 }
 bool check_line_intersection(int point1, int point2, int point3, int point4) {
+	//선분 p1p2 와 선분 p3p4 가 만나는지 return
 	Point p1 = point_list[point1];
 	Point p2 = point_list[point2];
 	Point p3 = point_list[point3];

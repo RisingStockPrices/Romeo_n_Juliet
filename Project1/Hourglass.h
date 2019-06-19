@@ -588,6 +588,8 @@ Return_val concatenate_two_funnels_oc(Chain** left, Chain** right, Edge * common
 Hourglass concatenate_hourglasses(int h1, int h2) {
 	return concatenate_hourglasses(hourglass_list[h1], hourglass_list[h2]);
 }
+
+
 Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 	 
 	bool left_openess = _left.check_openess();
@@ -595,6 +597,8 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 	Edge* left_edge_list = _left.get_edge_list();
 	Edge* right_edge_list = _right.get_edge_list();
 	
+	printf("dealing with hourglasses %d %d\n", _left.get_id(), _right.get_id());
+	printf("%d %d\n", left_openess, right_openess);
 	int common_edge_check[2];
 
 	for (int i = 0; i < 2; i++) {//두 hourglass가 공유하는 edge 찾아서 common_edge_check에 index저장
@@ -779,6 +783,8 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 			Chain * left_down_chain = left[outer_chain[(i+1)%2][0]];
 			Chain * right_down_chain = right[outer_chain[(i + 1) % 2][1]];
 			int t1, t2;
+
+			//이제 여기서부터 outer tangent 계산해서 valid한지 확인하고, apex가 chain의 어느 index에 있는지 뽑아내야됨!////////////////////////////////////
 			bool valid = compute_outer_tangent(left_upper_chain, right_upper_chain, &t1, &t2, common_edge, left_down_chain, right_down_chain);
 			
 			if (valid) {//set apex and left & right c_lists for the upcoming new chain!
@@ -805,6 +811,9 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 			outer_hour = new_hourglass;
 			//return outer_hour;
 		}
+		//////////////////////////////////////////////////////
+
+
 		//compute inner chain
 		Hourglass h[2];
 		bool h_valid[2] = { true, true };
@@ -942,4 +951,5 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 		return min;
 	}
 	return new_hourglass;
+
 }

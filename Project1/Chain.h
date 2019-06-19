@@ -246,7 +246,7 @@ public:
 		if (check_side == 0) return false;//common_edge기준 p1과 p2가 같은 side에 있지 않을때..?
 		
 		return true;
-		//여기까지는 닿지도 않...지??
+		//여기까지는 닿지도 않...지??ㅇㅇㅇ
 		bool check = check_line_intersection(p1, p2, common_edge->get_origin(), common_edge->get_dest());
 		if (check) return true;
 		
@@ -258,12 +258,12 @@ public:
 			return true;
 		return false;*/
 	}
-	Chain* cutting_chain(Edge * common_edge, int apax, Chain * c1) {
+	Chain* cutting_chain(Edge * common_edge, int apex, Chain * c1) {
 		int index = -1;
 		if (common_edge->check_same_point(c_point_list.front()) == -1) {//c_point[0]이 common edge를 이루는 vertex가 아닐때
 			for (int k = 0; k < (int)c_point_list.size(); k++) {
-				bool check1 = true;
-				check1 = check_enable_line(apax, c_point_list[k], common_edge, c1);//c1->check_one_side(apax, c_point_list[k], common_edge);
+				bool check1 = true;//check_enable_line에서 inner과 outer point가 같을 때 -> isLeft도 해당되고 isRight도 해당이 되넹...
+				check1 = check_enable_line(apex, c_point_list[k], common_edge, c1);//c1->check_one_side(apax, c_point_list[k], common_edge);
 				if (check1){// != 0) {
 					index = k;
 					break;
@@ -273,14 +273,16 @@ public:
 		else {
 			for (int k = (int)c_point_list.size() - 1; k >= 0; k--) {
 				bool check1 = true;
-				check1 = check_enable_line(apax, c_point_list[k], common_edge, c1);//c1->check_one_side(apax, c_point_list[k], common_edge);
+				check1 = check_enable_line(apex, c_point_list[k], common_edge, c1);//c1->check_one_side(apax, c_point_list[k], common_edge);
 				if (check1){// != 0) {
 					index = k;
 					break;
 				}
 			}
 		}
-		return (this->cutting_chain(common_edge, index, true, apax));
+		Chain* return_val = (this->cutting_chain(common_edge, index, true, apex));
+		return return_val;
+		return (this->cutting_chain(common_edge, index, true, apex));
 	}
 	//고쳐야함
 	/*Chain* cutting_chain(Edge * common_edge, int apax, Chain * c1, Chain* c2, bool reverse = false) {

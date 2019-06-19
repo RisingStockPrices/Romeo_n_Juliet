@@ -280,6 +280,7 @@ void add_test_point(int button, int state, int x, int y) {
 						h_num = (h_num == -1) ? s_graph[d_2][d_1] : h_num;
 						temp = hourglass_list[h_num];
 						final_hour = concatenate_hourglasses(temp, final_hour);
+						
 					}
 					final_hour = concatenate_hourglasses(origin, final_hour);
 					final_hour = concatenate_hourglasses(final_hour, dest);

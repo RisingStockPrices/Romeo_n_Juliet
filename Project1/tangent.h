@@ -194,23 +194,23 @@ RLtangent_PolyPolyC(vector<int> V, vector<int> W, int* t1, int* t2)
 	*t2 = ix2;
 	return;
 }
-bool side_check(Chain * left_upper_chain, Chain * right_upper_chain, Chain * left_down_chain, Chain * right_down_chain, int apax1, int apax2, Edge * common_edge) {
+bool side_check(Chain * left_upper_chain, Chain * right_upper_chain, Chain * left_down_chain, Chain * right_down_chain, int apex1, int apex2, Edge * common_edge) {
 
 	//int l1 = left_down_chain->check_one_side(apax1, apax2, common_edge);
 	//int r1 = right_down_chain->check_one_side(apax1, apax2, common_edge);
-	int l2 = left_upper_chain->check_one_side(apax1, apax2, common_edge);
-	int r2 = right_upper_chain->check_one_side(apax1, apax2, common_edge);
+	int l2 = left_upper_chain->check_one_side(apex1, apex2, common_edge);
+	int r2 = right_upper_chain->check_one_side(apex1, apex2, common_edge);
 	
 	if (l2 == 0 || r2 == 0)// || (l1 == l2 && l1 != 3) || (r1 == r2 && r2 != 3))
 		return false;
-	bool check = check_line_intersection(apax1, apax2, common_edge->get_origin(), common_edge->get_dest());
+	bool check = check_line_intersection(apex1, apex2, common_edge->get_origin(), common_edge->get_dest());
 	
 	if (check)
 		return true;
-	int check1 = common_edge->check_same_point(apax1);
-	int check2 = common_edge->check_same_point(apax2);
-	bool seq1 = left_upper_chain->check_sequence(apax1, apax2);
-	bool seq2 = right_upper_chain->check_sequence(apax1, apax2);
+	int check1 = common_edge->check_same_point(apex1);
+	int check2 = common_edge->check_same_point(apex2);
+	bool seq1 = left_upper_chain->check_sequence(apex1, apex2);
+	bool seq2 = right_upper_chain->check_sequence(apex1, apex2);
 	if ((check1 != -1 || check2 != -1) && (seq1 || seq2))
 		return true;
 	return false;
