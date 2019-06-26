@@ -671,9 +671,61 @@ void printPlease(Edge* _leftElist, Edge* _rightElist, Edge upperT, Edge lowerT, 
 	}
 	cout << endl;
 }
+vector<int> mountanizeHump(Edge tangent, vector<int> outliers, bool upper)
+{
+	vector<int> mountain;
+	int start = tangent.is_reverse() ? tangent.get_dest() : tangent.get_origin();
+	int end = tangent.is_reverse() ? tangent.get_origin() : tangent.get_dest();
+	vector<int>::iterator current = outliers.begin(); //called only when non-empty
+	vector<int>::iterator it;
+	bool (*which_side)(int, int, int) = upper ? is_right : is_left;
+	bool valid_tangent;
 
+	mountain.push_back(start);
 
-Chain final_single_chain(Edge tangent, vector<int> left_chain, vector<int> right_chain, Edge leftEdge, Edge rightEdge)
+	do {
+		valid_tangent = true;
+		if (current == outliers.end())
+		{
+			exit(3);//this shouldn't happen
+		}
+
+		for (it = outliers.begin(); it != outliers.end(); it++)
+		{
+			if (!which_side(*it, start, *current))
+			{
+				valid_tangent = false;
+				current++;
+				break;
+			}
+		}
+
+	} while (!valid_tangent);
+
+	do {
+		valid_tangent = true;
+
+		if (current == outliers.end())
+		{
+			exit(4);//shouldn't be happening
+		}
+		for (it = current; it != outliers.end(); it++)
+		{
+			if (!which_side(*it, *current, end)) {
+				valid_tangent = false;
+				mountain.push_back(*current);
+				current++;
+				break;
+			}
+		}
+	} while (!valid_tangent);
+
+	mountain.push_back(*current);
+	mountain.push_back(end);
+
+	return mountain;
+}
+Chain invalid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> right_chain, vector<int> outliers, Edge leftEdge, Edge rightEdge, bool upper) 
 {
 	int left_tangent_point = tangent.is_reverse() ? tangent.get_dest() : tangent.get_origin();
 	int right_tangent_point = tangent.is_reverse() ? tangent.get_origin() : tangent.get_dest();
@@ -700,9 +752,56 @@ Chain final_single_chain(Edge tangent, vector<int> left_chain, vector<int> right
 		piAB.pop_back();
 	}
 
-	tanBC.push_back(left_tangent_point);
-	if (!tangent.is_point())
-		tanBC.push_back(right_tangent_point);
+	it = find(right_chain.begin(), right_chain.end(), right_tangent_point);
+	if (it == right_chain.end())
+	{
+		exit(2);
+	}
+
+	if (right_chain[0] == rightEdge.get_origin() || right_chain[0] == rightEdge.get_dest())
+	{
+		piCD.insert(piCD.begin(), right_chain.begin(), it);
+	}
+	else
+	{
+		piCD.insert(piCD.begin(), it, right_chain.end());
+		reverse(piCD.begin(), piCD.end());
+		piCD.pop_back();
+	}
+
+	tanBC = mountanizeHump(tangent, outliers, upper);
+
+	result.append_points(piAB);
+	result.append_points(tanBC);
+	result.append_points(piCD);
+	return result;
+}
+Chain valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> right_chain, Edge leftEdge, Edge rightEdge)
+{
+	int left_tangent_point = tangent.is_reverse() ? tangent.get_dest() : tangent.get_origin();
+	int right_tangent_point = tangent.is_reverse() ? tangent.get_origin() : tangent.get_dest();
+
+	vector<int> piAB;
+	vector<int> tanBC;
+	vector<int> piCD;
+
+	Chain result;
+
+	vector<int>::iterator it = find(left_chain.begin(), left_chain.end(), left_tangent_point);
+	if (it == left_chain.end())
+	{
+		exit(1);
+	}
+
+	if (left_chain[0] == leftEdge.get_origin() || left_chain[0] == leftEdge.get_dest())
+	{
+		piAB.insert(piAB.begin(), left_chain.begin(), it);
+	}
+	else {
+		piAB.insert(piAB.begin(), it, left_chain.end());
+		reverse(piAB.begin(), piAB.end());
+		piAB.pop_back();
+	}
 
 	it = find(right_chain.begin(), right_chain.end(), right_tangent_point);
 	if (it == right_chain.end())
@@ -721,11 +820,17 @@ Chain final_single_chain(Edge tangent, vector<int> left_chain, vector<int> right
 		piCD.pop_back();
 	}
 
+	tanBC.push_back(left_tangent_point);
+	if (!tangent.is_point())
+		tanBC.push_back(right_tangent_point);
+
 	result.append_points(piAB);
 	result.append_points(tanBC);
 	result.append_points(piCD);
 	return result;
 }
+
+
 Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 {
 	Hourglass newHourglass;
@@ -833,27 +938,33 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	Chain* first[2];
 	Chain* second[2];
 
+	bool open = true;
 	if (UpperOutliers.empty())
 	{
-		upperChain = final_single_chain(upperT, left_upper_points, right_upper_points, leftEdge, rightEdge);
+		upperChain = valid_outer_chains(upperT, left_upper_points, right_upper_points, leftEdge, rightEdge);
 	}
 	else {
-
+		open = false;
+		upperChain = invalid_outer_chains(upperT, left_upper_points, right_upper_points, UpperOutliers, leftEdge, rightEdge, true);
 	}
 
 	if (LowerOutliers.empty())
 	{
-		lowerChain = final_single_chain(lowerT, left_lower_points, right_lower_points, leftEdge, rightEdge);
+		lowerChain = valid_outer_chains(lowerT, left_lower_points, right_lower_points, leftEdge, rightEdge);
 	}
 	else {
-
+		open = false;
+		lowerChain = invalid_outer_chains(lowerT, left_lower_points, right_lower_points, LowerOutliers, leftEdge, rightEdge, false);
 	}
 
-	//open case~
+	if(open)//open case~
+	{
 	first[0] = &upperChain;
 	first[1] = &lowerChain;
 	newHourglass.set_first_chain(first);
-
+	}
+	
+	
 	/*
 	if (UpperOutliers.size() == 0 && LowerOutliers.size() == 0) //newHourlgass is open, make sure 's' is NULL
 	{
@@ -967,7 +1078,7 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	else {
 
 	}*/
-	printPlease(leftEdgeList, rightEdgeList, upperT, lowerT, UpperOutliers, LowerOutliers);
+	//printPlease(leftEdgeList, rightEdgeList, upperT, lowerT, UpperOutliers, LowerOutliers);
 
 	
 	return newHourglass;
