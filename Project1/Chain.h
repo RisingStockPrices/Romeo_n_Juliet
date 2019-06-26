@@ -82,29 +82,44 @@ public:
 	void set_point_list(vector<int> _point_list) {
 		c_point_list = _point_list;
 	}
-	void add_point_list(vector<int> _point_list, point_type length = 0) {
-		if (_point_list[0] == c_point_list[0]) {
-			reverse(_point_list.begin(), _point_list.end());
-			_point_list.pop_back();
-			c_point_list.insert(c_point_list.begin(), _point_list.begin(), _point_list.end());
-		}
-		else if (_point_list[0] == c_point_list.back()) {
-			c_point_list.pop_back();
-			c_point_list.insert(c_point_list.end(), _point_list.begin(), _point_list.end());
-		}
-		else if (_point_list.back() == c_point_list.front()) {
-			_point_list.pop_back();
-			c_point_list.insert(c_point_list.begin(), _point_list.begin(), _point_list.end());
-		}
-		else if (_point_list.back() == c_point_list.back()) {
-			_point_list.pop_back();
-			reverse(_point_list.begin(), _point_list.end());
-			c_point_list.insert(c_point_list.end(), _point_list.begin(), _point_list.end());
+	void append_points(vector<int> point_list)
+	{
+		if (c_point_list.empty())
+		{
+			c_point_list = point_list;
 		}
 		else {
-			c_point_list.insert(c_point_list.end(), _point_list.begin(), _point_list.end());
+			for (int i = 0; i < point_list.size(); i++)
+			{
+				c_point_list.push_back(point_list[i]);
+			}
 		}
-		len += length;
+	}
+	void add_point_list(vector<int> _point_list, point_type length = 0) {
+		if (!_point_list.empty()) {
+			if (_point_list[0] == c_point_list[0]) {
+				reverse(_point_list.begin(), _point_list.end());
+				_point_list.pop_back();
+				c_point_list.insert(c_point_list.begin(), _point_list.begin(), _point_list.end());
+			}
+			else if (_point_list[0] == c_point_list.back()) {
+				c_point_list.pop_back();
+				c_point_list.insert(c_point_list.end(), _point_list.begin(), _point_list.end());
+			}
+			else if (_point_list.back() == c_point_list.front()) {
+				_point_list.pop_back();
+				c_point_list.insert(c_point_list.begin(), _point_list.begin(), _point_list.end());
+			}
+			else if (_point_list.back() == c_point_list.back()) {
+				_point_list.pop_back();
+				reverse(_point_list.begin(), _point_list.end());
+				c_point_list.insert(c_point_list.end(), _point_list.begin(), _point_list.end());
+			}
+			else {
+				c_point_list.insert(c_point_list.end(), _point_list.begin(), _point_list.end());
+			}
+			len += length;
+		}
 	}
 	void set_len(point_type _len) {
 		len = _len;
