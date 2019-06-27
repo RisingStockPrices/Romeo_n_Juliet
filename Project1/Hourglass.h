@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <algorithm>
+#include <set>
+
 #include "Point.h"
 #include "Edge.h"
 #include "polygon_operation.h"
@@ -320,7 +322,7 @@ public:
 	String* get_string() {
 		return s;
 	}
-	void set_apax(int _point, int _index) {
+	void set_apex(int _point, int _index) {
 		apax[_index] = _point;
 	}
 	int * get_apaxes() {
@@ -957,13 +959,83 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 		lowerChain = invalid_outer_chains(lowerT, left_lower_points, right_lower_points, LowerOutliers, leftEdge, rightEdge, false);
 	}
 
+	vector<int> string;
+	std::set<int> upperS;
+	std::set<int> lowerS;
+	vector<int> final_upper_list=upperChain.get_point_list();
+	vector<int> final_lower_list = lowerChain.get_point_list();
+	vector<int>::iterator up;
+	vector<int>::iterator low;
+	int start, end;
+
 	if(open)//open case~
 	{
 	first[0] = &upperChain;
 	first[1] = &lowerChain;
 	newHourglass.set_first_chain(first);
 	}
+	else {
+		up = final_upper_list.begin();
+		low = final_lower_list.begin();
+		lowerS.insert(*low);
+
+		while (up != final_upper_list.end() && low != final_lower_list.end())
+		{
+			if (lowerS.find(*up) != lowerS.end())
+			{
+				start = *up;
+				break;
+			}
+			else
+				upperS.insert(*up);
+			if (upperS.find(*low) != upperS.end())
+			{
+				start = *low;
+				break;
+			}
+			else
+				lowerS.insert(*low);
+
+			up++;
+			low++;
+		}//setting the start of the string
+
+		up = find(final_upper_list.begin(), final_upper_list.end(), start);
+		low = find(final_lower_list.begin(), final_lower_list.end(), start);
+
+		vector<int> upper;
+		vector<int> lower;
+
+		upper.insert(upper.begin(), final_upper_list.begin(), up);
+		lower.insert(lower.begin(), final_lower_list.begin(), low);
+		upper.push_back(start);
+		lower.push_back(start);
+		first[0] = new Chain(upper);
+		first[1] = new Chain(lower);
+		
+		while (*up == *low)
+		{
+			end = *up;
+			string.push_back(end);
+			up++;
+			low++;
+		}
 	
+		upper.clear();
+		lower.clear();
+		upper.push_back(end);
+		lower.push_back(end);
+		upper.insert(upper.end(), up, final_upper_list.end());
+		lower.insert(lower.end(), low, final_lower_list.end());
+		second[0] = new Chain(upper);
+		second[1] = new Chain(lower);
+
+		newHourglass.set_string(new String(string));
+		newHourglass.set_first_chain(first);
+		newHourglass.set_second_chain(second);
+		newHourglass.set_apex(start, 0);
+		newHourglass.set_apex(end, 1);		
+	}
 	
 	/*
 	if (UpperOutliers.size() == 0 && LowerOutliers.size() == 0) //newHourlgass is open, make sure 's' is NULL
@@ -1080,7 +1152,6 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	}*/
 	//printPlease(leftEdgeList, rightEdgeList, upperT, lowerT, UpperOutliers, LowerOutliers);
 
-	
 	return newHourglass;
 }
 
@@ -1119,14 +1190,14 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 		if (common_edge_check[0] == 0) {
 			new_hourglass.set_first_edge(left_edge_list[1]);
 			new_hourglass.set_first_chain(_left.get_second_chain());
-			new_hourglass.set_apax(_left.get_apaxes()[1],0);
+			new_hourglass.set_apex(_left.get_apaxes()[1],0);
 			lc = _left.get_first_chain();
 			la = _left.get_apaxes()[0];
 		}
 		else {
 			new_hourglass.set_first_edge(left_edge_list[0]);
 			new_hourglass.set_first_chain(_left.get_first_chain());
-			new_hourglass.set_apax(_left.get_apaxes()[0], 0);
+			new_hourglass.set_apex(_left.get_apaxes()[0], 0);
 			lc = _left.get_second_chain();
 			la = _left.get_apaxes()[1];
 		}
@@ -1134,14 +1205,14 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 		if (common_edge_check[1] == 0) {
 			new_hourglass.set_second_edge(right_edge_list[1]);
 			new_hourglass.set_second_chain(_right.get_second_chain());
-			new_hourglass.set_apax(_right.get_apaxes()[1], 0);
+			new_hourglass.set_apex(_right.get_apaxes()[1], 0);
 			rc = _right.get_first_chain();
 			ra = _right.get_apaxes()[0];
 		}
 		else {
 			new_hourglass.set_second_edge(right_edge_list[0]);
 			new_hourglass.set_second_chain(_right.get_first_chain());
-			new_hourglass.set_apax(_right.get_apaxes()[0], 0);
+			new_hourglass.set_apex(_right.get_apaxes()[0], 0);
 			rc = _right.get_second_chain();
 			ra = _right.get_apaxes()[1];
 		}
@@ -1172,20 +1243,20 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 		if (common_edge_check[0] == 0) {
 			new_hourglass.set_first_edge(left_edge_list[1]);
 			new_hourglass.set_first_chain(_left.get_second_chain());
-			new_hourglass.set_apax(_left.get_apaxes()[1], 0);
+			new_hourglass.set_apex(_left.get_apaxes()[1], 0);
 			r_val = concatenate_two_funnels_oc(_left.get_first_chain(), _right.get_first_chain(), common_edge, _left.get_apaxes()[0], new_hourglass.get_second_edge());
-			new_hourglass.set_apax(_left.get_apaxes()[0], 1);
+			new_hourglass.set_apex(_left.get_apaxes()[0], 1);
 		}
 		else {
 			new_hourglass.set_first_edge(left_edge_list[0]);
 			new_hourglass.set_first_chain(_left.get_first_chain());
-			new_hourglass.set_apax(_left.get_apaxes()[0], 0);
+			new_hourglass.set_apex(_left.get_apaxes()[0], 0);
 			r_val = concatenate_two_funnels_oc(_left.get_second_chain(), _right.get_first_chain(), common_edge, _left.get_apaxes()[1], new_hourglass.get_second_edge());
-			new_hourglass.set_apax(_left.get_apaxes()[1], 1);
+			new_hourglass.set_apex(_left.get_apaxes()[1], 1);
 		}
  		if (r_val.new_string != NULL) {
 			new_hourglass.set_string(new String(_left.get_string(), r_val.new_string));
-			new_hourglass.set_apax(r_val.apax, 1);
+			new_hourglass.set_apex(r_val.apax, 1);
 		}
 		new_hourglass.set_second_chain(r_val.chain);
 		
@@ -1203,29 +1274,29 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 		if (common_edge_check[1] == 0) {
 			new_hourglass.set_second_edge(right_edge_list[1]);
 			new_hourglass.set_second_chain(_right.get_second_chain());
-			new_hourglass.set_apax(_right.get_apaxes()[1], 1);
+			new_hourglass.set_apex(_right.get_apaxes()[1], 1);
 			r_val = concatenate_two_funnels_oc(_right.get_first_chain(), _left.get_first_chain(), common_edge, _right.get_apaxes()[0], new_hourglass.get_first_edge());
-			new_hourglass.set_apax(_right.get_apaxes()[0], 0);
+			new_hourglass.set_apex(_right.get_apaxes()[0], 0);
 		}
 		else {
 			new_hourglass.set_second_edge(right_edge_list[0]);
 			new_hourglass.set_second_chain(_right.get_first_chain());
-			new_hourglass.set_apax(_right.get_apaxes()[0], 1);
+			new_hourglass.set_apex(_right.get_apaxes()[0], 1);
 			r_val = concatenate_two_funnels_oc(_right.get_second_chain(), _left.get_first_chain(), common_edge, _right.get_apaxes()[1], new_hourglass.get_first_edge());
-			new_hourglass.set_apax(_right.get_apaxes()[1], 0);
+			new_hourglass.set_apex(_right.get_apaxes()[1], 0);
 		}
 		if (r_val.new_string != NULL) {
 			new_hourglass.set_string(new String(r_val.new_string, _right.get_string()));
-			new_hourglass.set_apax(r_val.apax, 0);
+			new_hourglass.set_apex(r_val.apax, 0);
 		}
 		new_hourglass.set_first_chain(r_val.chain);
 	}
 	else {//two open hourglasses-> could be open or closed
 		//set first_edge and second edge
 
-		concatenateOpenOpen(_left, _right);/////////////////////////////////////debugging용도임니다.
+		return concatenateOpenOpen(_left, _right);/////////////////////////////////////debugging용도임니다.
 
-
+		/*
 		if (common_edge_check[0] == 0) {//0번째 edge가 common일때
 			new_hourglass.set_first_edge(left_edge_list[1]);//common아닌 애를 new H의 first edge로 만든다
 		}
@@ -1370,7 +1441,7 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 				ret[0] = cutting_chain_u;
 				ret[1] = cutting_chain_d;
 				new_hourglass.set_first_chain(ret);
-				new_hourglass.set_apax(apax1, 0);
+				new_hourglass.set_apex(apax1, 0);
 				new_hourglass.set_string(new String(apax1, apax2));
 
 				cutting_chain_u = right_upper_chain->cutting_chain(common_edge, apax2, right_down_chain);
@@ -1378,7 +1449,7 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 				ret[0] = cutting_chain_u;
 				ret[1] = cutting_chain_d;
 				new_hourglass.set_second_chain(ret);
-				new_hourglass.set_apax(apax2, 1);
+				new_hourglass.set_apex(apax2, 1);
 				
 				if (new_hourglass.check_valid()) {
 					new_hourglass.duplicate_strings();
@@ -1431,7 +1502,7 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 			}
 			else {
 				h_valid[i] = false;
-			}*/
+			}
 			
 		}
 		Hourglass min;
@@ -1450,7 +1521,7 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 		if (min_len == -1) {
 			cout << "Somthings wrong" << endl;
 		}
-		return min;
+		return min;*/
 	}
 	return new_hourglass;
 
