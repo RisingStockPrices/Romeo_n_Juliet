@@ -217,9 +217,23 @@ private:
 	//Edge second;
 	Chain * first_chain[2];
 	Chain * second_chain[2];
-	int apax[2];
+	int apex[2];
 	String * s;
 public:
+	Hourglass& operator=(const Hourglass& rhs) {
+		id = rhs.id;
+	
+		for (int i = 0; i < 2; i++)
+		{
+			edge_list[i] = rhs.edge_list[i];
+			first_chain[i] = rhs.first_chain[i];
+			second_chain[i] = (rhs.second_chain[i]);
+			apex[i] = rhs.apex[i];
+		}
+		s = (rhs.s);
+		return *this;
+	}
+
 	Hourglass() {
 		init();
 	}
@@ -283,7 +297,7 @@ public:
 		for (int i = 0; i < 2; i++) {
 			first_chain[i] = NULL;
 			second_chain[i] = NULL;
-			apax[i] = 0;
+			apex[i] = 0;
 		}
 		s = NULL;
 	}
@@ -323,10 +337,10 @@ public:
 		return s;
 	}
 	void set_apex(int _point, int _index) {
-		apax[_index] = _point;
+		apex[_index] = _point;
 	}
 	int * get_apaxes() {
-		return apax;
+		return apex;
 	}
 	point_type get_len() {
 		point_type len =0;
@@ -363,20 +377,20 @@ public:
 
 				if (new_s != NULL) {
 					s = new_s;
-					apax[0] = f_a;
-					apax[1] = s_a;
+					apex[0] = f_a;
+					apex[1] = s_a;
 					second_chain[0] = new Chain(s_a);
 					second_chain[1] = new Chain(s_a);
 				}
 			}
 			else {
-				new_s = duplicate_string(s, first_chain, apax[0]);
+				new_s = duplicate_string(s, first_chain, apex[0]);
 				if (new_s != NULL) {
 					s = new_s;
 				}
 			}
 		}
-		if(second_chain[0] !=NULL) new_s = duplicate_string(s, second_chain, apax[1]);
+		if(second_chain[0] !=NULL) new_s = duplicate_string(s, second_chain, apex[1]);
 		if (new_s != NULL) s = new_s;
 
 		return;
@@ -397,8 +411,8 @@ public:
 		s = NULL;
 	}
 	void clear_apaxes() {
-		apax[0] = -1;
-		apax[1] = -1;
+		apex[0] = -1;
+		apex[1] = -1;
 	}
 	bool check_valid() {
 		for (int i = 0; i < 2; i++) {
@@ -727,7 +741,7 @@ vector<int> mountanizeHump(Edge tangent, vector<int> outliers, bool upper)
 
 	return mountain;
 }
-Chain invalid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> right_chain, vector<int> outliers, Edge leftEdge, Edge rightEdge, bool upper) 
+Chain* invalid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> right_chain, vector<int> outliers, Edge leftEdge, Edge rightEdge, bool upper) 
 {
 	int left_tangent_point = tangent.is_reverse() ? tangent.get_dest() : tangent.get_origin();
 	int right_tangent_point = tangent.is_reverse() ? tangent.get_origin() : tangent.get_dest();
@@ -736,7 +750,7 @@ Chain invalid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> rig
 	vector<int> tanBC;
 	vector<int> piCD;
 
-	Chain result;
+	Chain* result=new Chain();
 
 	vector<int>::iterator it = find(left_chain.begin(), left_chain.end(), left_tangent_point);
 	if (it == left_chain.end())
@@ -773,12 +787,12 @@ Chain invalid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> rig
 
 	tanBC = mountanizeHump(tangent, outliers, upper);
 
-	result.append_points(piAB);
-	result.append_points(tanBC);
-	result.append_points(piCD);
+	result->append_points(piAB);
+	result->append_points(tanBC);
+	result->append_points(piCD);
 	return result;
 }
-Chain valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> right_chain, Edge leftEdge, Edge rightEdge)
+Chain* valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> right_chain, Edge leftEdge, Edge rightEdge)
 {
 	int left_tangent_point = tangent.is_reverse() ? tangent.get_dest() : tangent.get_origin();
 	int right_tangent_point = tangent.is_reverse() ? tangent.get_origin() : tangent.get_dest();
@@ -787,7 +801,7 @@ Chain valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> right
 	vector<int> tanBC;
 	vector<int> piCD;
 
-	Chain result;
+	Chain* result = new Chain();
 
 	vector<int>::iterator it = find(left_chain.begin(), left_chain.end(), left_tangent_point);
 	if (it == left_chain.end())
@@ -826,16 +840,18 @@ Chain valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> right
 	if (!tangent.is_point())
 		tanBC.push_back(right_tangent_point);
 
-	result.append_points(piAB);
-	result.append_points(tanBC);
-	result.append_points(piCD);
+	result->append_points(piAB);
+	result->append_points(tanBC);
+	result->append_points(piCD);
 	return result;
 }
 
 
-Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
+Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right, Hourglass* result)
 {
-	Hourglass newHourglass;
+	Hourglass* hourglass_ptr = new Hourglass();
+	
+	//Hourglass newHourglass;
 	
 	Edge* leftEdgeList = _left.get_edge_list();
 	Edge* rightEdgeList = _right.get_edge_list();
@@ -862,8 +878,11 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	Edge rightEdge = rightEdgeList[!rightCommonEdgeIndex];
 
 	//left hourglass의 common하지 않은 edge를 first edge로 set함!! -> 이 순서가 중요한가?
-	newHourglass.set_first_edge(leftEdge);
-	newHourglass.set_second_edge(rightEdge);
+	
+	hourglass_ptr->set_first_edge(leftEdge);
+	hourglass_ptr->set_second_edge(rightEdge);
+	//newHourglass.set_first_edge(leftEdge);
+	//newHourglass.set_second_edge(rightEdge);
 
 
 	int left_chain_with_common_origin = leftChainList[0]->check_inclusive(commonEdge.get_origin())?0:1;
@@ -934,8 +953,8 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	vector<int> UpperOutliers = cross_the_line_check(upperT, left_lower_chain->get_point_list(), right_lower_chain->get_point_list(), true);
 	vector<int> LowerOutliers = cross_the_line_check(lowerT, left_upper_chain->get_point_list(), right_upper_chain->get_point_list(), false);
 
-	Chain upperChain;
-	Chain lowerChain;
+	Chain* upperChain;
+	Chain* lowerChain;
 
 	Chain* first[2];
 	Chain* second[2];
@@ -962,17 +981,18 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	vector<int> string;
 	std::set<int> upperS;
 	std::set<int> lowerS;
-	vector<int> final_upper_list=upperChain.get_point_list();
-	vector<int> final_lower_list = lowerChain.get_point_list();
+	vector<int> final_upper_list=upperChain->get_point_list();
+	vector<int> final_lower_list = lowerChain->get_point_list();
 	vector<int>::iterator up;
 	vector<int>::iterator low;
 	int start, end;
 
 	if(open)//open case~
 	{
-	first[0] = &upperChain;
-	first[1] = &lowerChain;
-	newHourglass.set_first_chain(first);
+	first[0] = upperChain;
+	first[1] = lowerChain;
+	//newHourglass.set_first_chain(first);
+	hourglass_ptr->set_first_chain(first);
 	}
 	else {
 		up = final_upper_list.begin();
@@ -1030,11 +1050,17 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 		second[0] = new Chain(upper);
 		second[1] = new Chain(lower);
 
-		newHourglass.set_string(new String(string));
-		newHourglass.set_first_chain(first);
-		newHourglass.set_second_chain(second);
-		newHourglass.set_apex(start, 0);
-		newHourglass.set_apex(end, 1);		
+		hourglass_ptr->set_string(new String(string));
+		hourglass_ptr->set_first_chain(first);
+		hourglass_ptr->set_second_chain(second);
+		hourglass_ptr->set_apex(start, 0);
+		hourglass_ptr->set_apex(end, 1);
+
+		//newHourglass.set_string(new String(string));
+		//newHourglass.set_first_chain(first);
+		//newHourglass.set_second_chain(second);
+		//newHourglass.set_apex(start, 0);
+		//newHourglass.set_apex(end, 1);		
 	}
 	
 	/*
@@ -1152,7 +1178,8 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	}*/
 	//printPlease(leftEdgeList, rightEdgeList, upperT, lowerT, UpperOutliers, LowerOutliers);
 
-	return newHourglass;
+return *hourglass_ptr;
+	//return newHourglass;
 }
 
 
@@ -1293,9 +1320,226 @@ Hourglass concatenate_hourglasses(Hourglass& _left, Hourglass& _right) {
 	}
 	else {//two open hourglasses-> could be open or closed
 		//set first_edge and second edge
+		Hourglass* hourglass_ptr = new Hourglass();
 
-		return concatenateOpenOpen(_left, _right);/////////////////////////////////////debugging용도임니다.
+		//Hourglass newHourglass;
 
+		Edge* leftEdgeList = _left.get_edge_list();
+		Edge* rightEdgeList = _right.get_edge_list();
+		Chain** leftChainList = _left.get_first_chain();//first_chain에만 최종 저장할 거니까 이렇게 둡시다.
+		Chain** rightChainList = _right.get_first_chain();
+
+		Edge commonEdge;
+		int leftCommonEdgeIndex = 0, rightCommonEdgeIndex = 0;
+
+		for (int i = 0; i < 2; i++) //두 edge 모두 같은 경우는 없다고 가정함니다.
+		{
+			for (int j = 0; j < 2; j++)
+			{
+				if (leftEdgeList[i] == rightEdgeList[j]) {
+					leftCommonEdgeIndex = i;
+					rightCommonEdgeIndex = j;
+					commonEdge = Edge(leftEdgeList[i].get_origin(), leftEdgeList[i].get_dest());
+					break;
+				}
+			}
+		}
+
+		Edge leftEdge = leftEdgeList[!leftCommonEdgeIndex];
+		Edge rightEdge = rightEdgeList[!rightCommonEdgeIndex];
+
+		//left hourglass의 common하지 않은 edge를 first edge로 set함!! -> 이 순서가 중요한가?
+
+		hourglass_ptr->set_first_edge(leftEdge);
+		hourglass_ptr->set_second_edge(rightEdge);
+		//newHourglass.set_first_edge(leftEdge);
+		//newHourglass.set_second_edge(rightEdge);
+
+
+		int left_chain_with_common_origin = leftChainList[0]->check_inclusive(commonEdge.get_origin()) ? 0 : 1;
+		int right_chain_with_common_origin = rightChainList[0]->check_inclusive(commonEdge.get_origin()) ? 0 : 1;
+		int left_chain_with_left_origin = leftChainList[0]->check_inclusive(leftEdge.get_origin()) ? 0 : 1;
+		int right_chain_with_right_origin = rightChainList[0]->check_inclusive(rightEdge.get_origin()) ? 0 : 1;
+
+
+		Chain* left_upper_chain;
+		Chain* left_lower_chain;
+		Chain* right_upper_chain;
+		Chain* right_lower_chain;
+
+		if (leftEdge.is_point())
+		{
+			if (is_left(commonEdge.get_dest(), leftEdge.get_dest(), commonEdge.get_origin())) {//이건 is_right조건 필요없나??
+				left_lower_chain = leftChainList[left_chain_with_common_origin];
+				left_upper_chain = leftChainList[!left_chain_with_common_origin];
+			}
+			else {
+				left_upper_chain = leftChainList[left_chain_with_common_origin];
+				left_lower_chain = leftChainList[!left_chain_with_common_origin];
+			}
+		}
+		else {
+			if (is_left(leftEdge.get_dest(), leftEdge.get_origin(), commonEdge.get_origin()) && is_left(leftEdge.get_dest(), leftEdge.get_origin(), commonEdge.get_dest())) {
+				left_lower_chain = leftChainList[left_chain_with_left_origin];
+				left_upper_chain = leftChainList[!left_chain_with_left_origin];
+			}
+			else {
+				left_upper_chain = leftChainList[left_chain_with_left_origin];
+				left_lower_chain = leftChainList[!left_chain_with_left_origin];
+			}
+		}
+
+		if (rightEdge.is_point())
+		{
+			if (is_left(commonEdge.get_dest(), rightEdge.get_dest(), commonEdge.get_origin())) {
+				right_upper_chain = rightChainList[right_chain_with_common_origin];
+				right_lower_chain = rightChainList[!right_chain_with_common_origin];
+			}
+			else {
+				right_lower_chain = rightChainList[right_chain_with_common_origin];
+				right_upper_chain = rightChainList[!right_chain_with_common_origin];
+			}
+		}
+		else {
+			if (is_left(rightEdge.get_dest(), rightEdge.get_origin(), commonEdge.get_origin()) && is_left(rightEdge.get_dest(), rightEdge.get_origin(), commonEdge.get_dest())) {
+				right_upper_chain = rightChainList[right_chain_with_right_origin];
+				right_lower_chain = rightChainList[!right_chain_with_right_origin];
+			}
+			else {
+				right_lower_chain = rightChainList[right_chain_with_right_origin];
+				right_upper_chain = rightChainList[!right_chain_with_right_origin];
+			}
+		}
+
+		vector<int> left_upper_points = left_upper_chain->get_point_list();
+		vector<int> left_lower_points = left_lower_chain->get_point_list();
+		vector<int> right_lower_points = right_lower_chain->get_point_list();
+		vector<int> right_upper_points = right_upper_chain->get_point_list();
+		//assign left&right / upper&lower chains ^^^^^^^^^^
+
+		Edge upperT = computeOuterTangent(left_upper_chain, right_upper_chain, true);
+		Edge lowerT = computeOuterTangent(left_lower_chain, right_lower_chain, false);
+		//computed outerTangents -> not all valid yet
+
+		vector<int> UpperOutliers = cross_the_line_check(upperT, left_lower_chain->get_point_list(), right_lower_chain->get_point_list(), true);
+		vector<int> LowerOutliers = cross_the_line_check(lowerT, left_upper_chain->get_point_list(), right_upper_chain->get_point_list(), false);
+
+		Chain* upperChain=new Chain();
+		Chain* lowerChain=new Chain();
+
+		Chain* first[2];
+		Chain* second[2];
+
+		bool open = true;
+		if (UpperOutliers.empty())
+		{
+			upperChain = valid_outer_chains(upperT, left_upper_points, right_upper_points, leftEdge, rightEdge);
+			//upperChain->set_point_list(temp->get_point_list());
+		}
+		else {
+			open = false;
+			upperChain = invalid_outer_chains(upperT, left_upper_points, right_upper_points, UpperOutliers, leftEdge, rightEdge, true);
+		}
+
+		if (LowerOutliers.empty())
+		{
+			lowerChain = valid_outer_chains(lowerT, left_lower_points, right_lower_points, leftEdge, rightEdge);
+		}
+		else {
+			open = false;
+			lowerChain = invalid_outer_chains(lowerT, left_lower_points, right_lower_points, LowerOutliers, leftEdge, rightEdge, false);
+		}
+
+		vector<int> string;
+		std::set<int> upperS;
+		std::set<int> lowerS;
+		vector<int> final_upper_list = upperChain->get_point_list();
+		vector<int> final_lower_list = lowerChain->get_point_list();
+		vector<int>::iterator up;
+		vector<int>::iterator low;
+		int start, end;
+
+		if (open)//open case~
+		{
+			first[0] = upperChain;
+			first[1] = lowerChain;
+			//newHourglass.set_first_chain(first);
+			hourglass_ptr->set_first_chain(first);
+		}
+		else {
+			up = final_upper_list.begin();
+			low = final_lower_list.begin();
+			lowerS.insert(*low);
+
+			while (up != final_upper_list.end() && low != final_lower_list.end())
+			{
+				if (lowerS.find(*up) != lowerS.end())
+				{
+					start = *up;
+					break;
+				}
+				else
+					upperS.insert(*up);
+				if (upperS.find(*low) != upperS.end())
+				{
+					start = *low;
+					break;
+				}
+				else
+					lowerS.insert(*low);
+
+				up++;
+				low++;
+			}//setting the start of the string
+
+			up = find(final_upper_list.begin(), final_upper_list.end(), start);
+			low = find(final_lower_list.begin(), final_lower_list.end(), start);
+
+			vector<int> upper;
+			vector<int> lower;
+
+			upper.insert(upper.begin(), final_upper_list.begin(), up);
+			lower.insert(lower.begin(), final_lower_list.begin(), low);
+			upper.push_back(start);
+			lower.push_back(start);
+			first[0] = new Chain(upper);
+			first[1] = new Chain(lower);
+
+			while (*up == *low)
+			{
+				end = *up;
+				string.push_back(end);
+				up++;
+				low++;
+			}
+
+			upper.clear();
+			lower.clear();
+			upper.push_back(end);
+			lower.push_back(end);
+			upper.insert(upper.end(), up, final_upper_list.end());
+			lower.insert(lower.end(), low, final_lower_list.end());
+			second[0] = new Chain(upper);
+			second[1] = new Chain(lower);
+
+			hourglass_ptr->set_string(new String(string));
+			hourglass_ptr->set_first_chain(first);
+			hourglass_ptr->set_second_chain(second);
+			hourglass_ptr->set_apex(start, 0);
+			hourglass_ptr->set_apex(end, 1);
+
+			//newHourglass.set_string(new String(string));
+			//newHourglass.set_first_chain(first);
+			//newHourglass.set_second_chain(second);
+			//newHourglass.set_apex(start, 0);
+			//newHourglass.set_apex(end, 1);		
+		}
+
+		
+		return *hourglass_ptr;
+		Hourglass result;
+		concatenateOpenOpen(_left, _right,&result);/////////////////////////////////////debugging용도임니다.
+		return result;
 		/*
 		if (common_edge_check[0] == 0) {//0번째 edge가 common일때
 			new_hourglass.set_first_edge(left_edge_list[1]);//common아닌 애를 new H의 first edge로 만든다

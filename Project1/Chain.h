@@ -10,6 +10,14 @@ private:
 	vector<int> c_point_list;
 	point_type len;
 public:
+	Chain operator= (Chain rhs) {
+		vector<int> _point_list = rhs.c_point_list;
+		c_point_list = _point_list;
+		len = rhs.len;
+		printf("Chain operator =\n");
+
+		return *this;
+	}
 	Chain() {
 		len = 0;
 	}
