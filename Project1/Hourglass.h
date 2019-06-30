@@ -667,6 +667,8 @@ vector<int> cross_the_line_check(Edge tangent, vector<int> leftP, vector<int> ri
 	//if (which_side(pointList[0], to, from))
 		//hump.push_back(pointList[0]);
 
+	if (check_line_intersection(pointList[0],pointList[0],from,to) && is_left(pointList[0], from, to) && is_right(pointList[0], from, to))
+		hump.push_back(pointList[0]);
 	for (int i = 1; i != pointList.size(); i++)
 	{
 		if (check_line_intersection(pointList[i - 1], pointList[i], from, to))

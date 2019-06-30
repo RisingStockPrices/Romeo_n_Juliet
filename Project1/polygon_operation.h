@@ -86,11 +86,32 @@ Edge get_edge(int d_num) {
 }
 bool check_line_intersection(int point1, int point2, int point3, int point4) {
 	//선분 p1p2 와 선분 p3p4 가 만나는지 return
+	
 	Point p1 = point_list[point1];
 	Point p2 = point_list[point2];
 	Point p3 = point_list[point3];
 	Point p4 = point_list[point4];
 
+	if (point1 == point2)
+	{
+		point_type dx_a = p1.get_x()-p3.get_x();
+		point_type dx_b = p4.get_x()-p1.get_x();
+		point_type dy_a = p1.get_y()-p3.get_y();
+		point_type dy_b = p4.get_y()-p1.get_y();
+		if (dy_a == 0 && dy_b == 0)
+		{
+			if (dx_a * dx_b >= 0)
+				return true;
+			else
+				return false;
+		}
+		else {
+			if (dx_a / dy_a == dx_b / dy_b)
+				return true;
+			else
+				return false;
+		}
+	}
 	point_type ua = (p4.get_x() - p3.get_x()) * (p1.get_y() - p3.get_y()) - (p4.get_y() - p3.get_y()) * (p1.get_x() - p3.get_x());
 	point_type ub = (p2.get_x() - p1.get_x()) * (p1.get_y() - p3.get_y()) - (p2.get_y() - p1.get_y()) * (p1.get_x() - p3.get_x());
 	point_type denominator = (p4.get_y() - p3.get_y()) * (p2.get_x() - p1.get_x()) - (p4.get_x() - p3.get_x()) * (p2.get_y() - p1.get_y());
