@@ -92,6 +92,10 @@ bool check_line_intersection(int point1, int point2, int point3, int point4) {
 	Point p3 = point_list[point3];
 	Point p4 = point_list[point4];
 
+	if (point3 == point4)
+	{
+		return false;
+	}
 	if (point1 == point2)
 	{
 		point_type dx_a = p1.get_x()-p3.get_x();

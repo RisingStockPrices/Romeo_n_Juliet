@@ -660,17 +660,27 @@ vector<int> cross_the_line_check(Edge tangent, vector<int> leftP, vector<int> ri
 	leftP.insert(leftP.end(), rightP.begin() + 1, rightP.end());
 	vector<int> pointList = leftP;
 	vector<int> hump;
+
 	int from = (tangent.is_reverse()) ? tangent.get_dest() : tangent.get_origin();
 	int to = (tangent.is_reverse())?tangent.get_origin():tangent.get_dest();
 
+	
 	//we have to assign to -from so it goes in a left-> right order
 	//if (which_side(pointList[0], to, from))
 		//hump.push_back(pointList[0]);
 
+	/*
+	for (int i = 0; i != pointList.size(); i++)
+	{
+		if (which_side(pointList[i], from, to))
+			hump.push_back(pointList[i]);
+	}*/
+	
 	if (check_line_intersection(pointList[0],pointList[0],from,to) && is_left(pointList[0], from, to) && is_right(pointList[0], from, to))
 		hump.push_back(pointList[0]);
 	for (int i = 1; i != pointList.size(); i++)
 	{
+
 		if (check_line_intersection(pointList[i - 1], pointList[i], from, to))
 		{
 			if (which_side(pointList[i], from, to))
@@ -907,6 +917,132 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	Chain* right_upper_chain;
 	Chain* right_lower_chain;
 
+	int common_upper_point = -1; 
+	int common_lower_point = -1;;
+
+	int upper_index, lower_index;
+
+
+
+	if (leftEdge.is_point())
+	{
+		lower_index = is_left(commonEdge.get_dest(), leftEdge.get_dest(), commonEdge.get_origin()) ? left_chain_with_common_origin : !left_chain_with_common_origin;
+	}
+	else
+	{
+		lower_index = is_left(leftEdge.get_dest(), leftEdge.get_origin(), commonEdge.get_origin()) && is_left(leftEdge.get_dest(), leftEdge.get_origin(), commonEdge.get_dest()) ? left_chain_with_left_origin : !left_chain_with_left_origin;
+	}
+	upper_index = !lower_index;
+
+	left_upper_chain = leftChainList[upper_index];
+	left_lower_chain = leftChainList[lower_index];
+
+	if (rightEdge.is_point())
+	{
+		upper_index = is_left(commonEdge.get_dest(), rightEdge.get_dest(), commonEdge.get_origin()) ? right_chain_with_common_origin : !right_chain_with_common_origin;
+	}
+	else
+	{
+		upper_index = is_left(rightEdge.get_dest(), rightEdge.get_origin(), commonEdge.get_origin()) && is_left(rightEdge.get_dest(), rightEdge.get_origin(), commonEdge.get_dest()) ? right_chain_with_right_origin : !right_chain_with_right_origin;
+	}
+	lower_index = !upper_index;
+
+	right_upper_chain = rightChainList[upper_index];
+	right_lower_chain = rightChainList[lower_index];
+
+	bool leftEdge_common_point=leftEdge.is_point() && commonEdge.check_same_point(leftEdge.get_origin())!=-1;
+	bool rightEdge_common_point= rightEdge.is_point() && commonEdge.check_same_point(rightEdge.get_origin())!=-1;
+	if (!leftEdge_common_point)
+	{
+		common_upper_point = left_upper_chain->check_inclusive(commonEdge.get_origin()) ? commonEdge.get_origin() : commonEdge.get_dest();
+		common_lower_point = commonEdge.get_dest() == common_upper_point ? commonEdge.get_origin() : commonEdge.get_dest();
+	}
+	else if (!rightEdge_common_point)
+	{
+		common_upper_point = right_upper_chain->check_inclusive(commonEdge.get_origin()) ? commonEdge.get_origin() : commonEdge.get_dest();
+		common_lower_point = commonEdge.get_dest() == common_upper_point ? commonEdge.get_origin() : commonEdge.get_dest();
+	}
+	else
+	{
+		exit(8);
+		//not sure what this case is gonna look like
+	}
+
+	if (leftEdge_common_point)
+	{
+		if (leftChainList[0]->check_inclusive(common_upper_point) && leftChainList[1]->check_inclusive(common_lower_point))
+		{
+			upper_index = 0;
+		}
+		else
+		{
+			upper_index = 1;
+		}
+
+		lower_index = !upper_index;
+		left_upper_chain = leftChainList[upper_index];
+		left_lower_chain = leftChainList[lower_index];
+	}
+	if (rightEdge_common_point)
+	{
+		if (rightChainList[0]->check_inclusive(common_upper_point) && rightChainList[1]->check_inclusive(common_lower_point))
+		{
+			upper_index = 0;
+		}
+		else
+		{
+			upper_index = 1;
+		}
+
+		lower_index = !upper_index;
+		right_upper_chain = rightChainList[upper_index];
+		right_lower_chain = rightChainList[lower_index];
+	}
+	
+
+	/*
+	//choose common_upper and common_lower
+	if (!leftEdge.is_point())
+	{
+		int lower_index = is_left(leftEdge.get_dest(), leftEdge.get_origin(), commonEdge.get_origin()) && is_left(leftEdge.get_dest(), leftEdge.get_origin(), commonEdge.get_dest()) ? left_chain_with_left_origin : !left_chain_with_left_origin;
+		int upper_index = !lower_index;
+
+		left_lower_chain = leftChainList[lower_index];
+		left_upper_chain = leftChainList[upper_index];
+
+		common_upper_point = left_upper_chain->check_inclusive(commonEdge.get_origin()) ? commonEdge.get_origin() : commonEdge.get_dest();
+		common_lower_point = commonEdge.get_dest() == common_upper_point ? commonEdge.get_origin() : commonEdge.get_dest();
+
+		if (rightEdge.is_point())
+		{
+			
+		}
+		else
+		{
+
+		}
+	}
+	else//leftEdge 가 point면 rightEdge로 정해야한다
+	{
+		if (!rightEdge.is_point())
+		{
+			int upper_index = is_left(rightEdge.get_dest(), rightEdge.get_origin(), commonEdge.get_origin()) && is_left(rightEdge.get_dest(), rightEdge.get_origin(), commonEdge.get_dest()) ? right_chain_with_right_origin : !right_chain_with_right_origin;
+			int lower_index = !upper_index;
+
+			right_upper_chain = rightChainList[upper_index];
+			right_lower_chain = rightChainList[lower_index];
+
+			common_upper_point = right_upper_chain->check_inclusive(commonEdge.get_origin()) ? commonEdge.get_origin() : commonEdge.get_dest();
+			common_lower_point = commonEdge.get_dest() == common_upper_point ? commonEdge.get_origin() : commonEdge.get_dest();
+
+		}
+		else
+		{
+
+		}
+	}*/
+
+	/*
 	if (leftEdge.is_point())
 	{
 		if (is_left(commonEdge.get_dest(), leftEdge.get_dest(), commonEdge.get_origin())) {//이건 is_right조건 필요없나??
@@ -928,7 +1064,6 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 			left_lower_chain = leftChainList[!left_chain_with_left_origin];
 		}
 	}
-
 	if (rightEdge.is_point())
 	{
 		if (is_left(commonEdge.get_dest(), rightEdge.get_dest(), commonEdge.get_origin())) {
@@ -949,7 +1084,7 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 			right_lower_chain = rightChainList[right_chain_with_right_origin];
 			right_upper_chain = rightChainList[!right_chain_with_right_origin];
 		}
-	}
+	}*/
 
 	vector<int> left_upper_points = left_upper_chain->get_point_list();
 	vector<int> left_lower_points = left_lower_chain->get_point_list();
@@ -957,8 +1092,6 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	vector<int> right_upper_points = right_upper_chain->get_point_list();
 	//assign left&right / upper&lower chains ^^^^^^^^^^
 
-	int common_upper_point = left_upper_chain->check_inclusive(commonEdge.get_origin()) ? commonEdge.get_origin() : commonEdge.get_dest();
-	int common_lower_point = commonEdge.get_dest() == common_upper_point ? commonEdge.get_origin() : commonEdge.get_dest();
 
 	Edge upperT = computeOuterTangent(left_upper_points, right_upper_points, true);
 	Edge lowerT = computeOuterTangent(left_lower_points, right_lower_points, false);
@@ -991,6 +1124,9 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 		open = false;
 		lowerChain = invalid_outer_chains(lowerT, left_lower_points, right_lower_points, LowerOutliers, leftEdge, rightEdge, false);
 	}
+
+	if (upperChain->get_point_list()==lowerChain->get_point_list()) //for the point-point edge case -> should be closed
+		open = false;
 
 	vector<int> string;
 	std::set<int> upperS;
