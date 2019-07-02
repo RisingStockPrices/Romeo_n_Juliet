@@ -644,7 +644,38 @@ Edge computeOuterTangent(vector<int> left_point_list, vector<int> right_point_li
 	
 	return Edge(samePoint, samePoint);
 }
+class Vector {
+private:
+	float x;
+	float y;
+public:
+	Vector(int _from, int _to)
+	{
+		x = point_list[_to].get_x() - point_list[_from].get_x();
+		y = point_list[_to].get_y() - point_list[_from].get_y();
+	}
+	float get_x()
+	{
+		return x;
+	}
+	float get_y()
+	{
+		return y;
+	}
+};
+float dot_product(int v1_p1, int v1_p2, int v2_p1, int v2_p2)
+{
+	
+	Vector v1 = Vector(v1_p1, v1_p2);
+	Vector v2 = Vector(v2_p1, v2_p2);
 
+	float v1_x = v1.get_x();
+	float v2_x = v2.get_x();
+	float v1_y = v1.get_y();
+	float v2_y = v2.get_y();
+
+	return v1_x * v2_x + v1_y * v2_y;
+}
 vector<int> cross_the_line_check(Edge tangent, vector<int> leftP, vector<int> rightP, int common_point, bool upper)
 {
 	bool(*which_side)(int, int, int) = upper ? is_left : is_right;
@@ -665,6 +696,15 @@ vector<int> cross_the_line_check(Edge tangent, vector<int> leftP, vector<int> ri
 	int to = (tangent.is_reverse())?tangent.get_origin():tangent.get_dest();
 
 	
+	for (int i = 0; i != pointList.size(); i++)
+	{
+		if (dot_product(from, to, from, pointList[i]) > 0 && dot_product(to, from, to, pointList[i]) > 0)
+		{
+			if (which_side(pointList[i], from, to))
+				hump.push_back(pointList[i]);
+		}
+	}
+	return hump;
 	//we have to assign to -from so it goes in a left-> right order
 	//if (which_side(pointList[0], to, from))
 		//hump.push_back(pointList[0]);
@@ -866,6 +906,16 @@ Chain* valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> righ
 	return result;
 }
 
+int nearest_point_to_common(Chain* chain, Edge common)
+{
+	vector<int> points = chain->get_point_list();
+
+	//check origin
+	if (points.front() == common.get_origin() || points.front() == common.get_dest())
+		return points[1];//second to first
+	else
+		return points[points.size() - 2];//second to last
+}
 
 Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 {
@@ -902,28 +952,83 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 
 	newHourglass.set_first_edge(leftEdge);
 	newHourglass.set_second_edge(rightEdge);
-	//newHourglass.set_first_edge(leftEdge);
-	//newHourglass.set_second_edge(rightEdge);
 
+	int common_upper_point = commonEdge.get_origin();
+	int common_lower_point = commonEdge.get_dest(); //if this doesn't work, we'll swap the two
 
-	int left_chain_with_common_origin = leftChainList[0]->check_inclusive(commonEdge.get_origin()) ? 0 : 1;
-	int right_chain_with_common_origin = rightChainList[0]->check_inclusive(commonEdge.get_origin()) ? 0 : 1;
-	int left_chain_with_left_origin = leftChainList[0]->check_inclusive(leftEdge.get_origin()) ? 0 : 1;
-	int right_chain_with_right_origin = rightChainList[0]->check_inclusive(rightEdge.get_origin()) ? 0 : 1;
+	int which_chain_to_test = 0;
+	bool found = false;
+	bool left = true;
+	Chain* chain_to_check;
 
+	if (leftEdge.is_point() && commonEdge.check_same_point(leftEdge.get_dest()))//the special case
+	{
+		which_chain_to_test = 2;
+	}
+	while (!found)
+	{
+		switch (which_chain_to_test){
+		case 0:
+		case 1:
+			chain_to_check = leftChainList[which_chain_to_test];
+			break;
+		case 2:
+		case 3:
+			left = false;
+			chain_to_check = rightChainList[which_chain_to_test-2];
+			break;
+		default:
+			printf("this shouldn't be happening\n");
+			exit(10);
+		}
+
+		if (chain_to_check->get_point_list_size() != 1)
+			found = true;
+		else
+			which_chain_to_test++;
+	}
+
+	int nearest = nearest_point_to_common(chain_to_check, commonEdge);
+	bool(*side)(int,int,int) = left ? is_left : is_right;
+
+	if (!side(nearest, common_lower_point, common_upper_point))
+		swap(common_upper_point, common_lower_point);
+	
+	//the common Edge's upper and lower point should be correctly set.....
 
 	Chain* left_upper_chain;
 	Chain* left_lower_chain;
 	Chain* right_upper_chain;
 	Chain* right_lower_chain;
 
+	if (leftChainList[0]->check_inclusive(common_upper_point))
+	{
+		left_upper_chain = leftChainList[0];
+		left_lower_chain = leftChainList[1];
+	}
+	else
+	{
+		left_upper_chain = leftChainList[1];
+		left_lower_chain = leftChainList[0];
+	}
+	if (rightChainList[0]->check_inclusive(common_upper_point))
+	{
+		right_upper_chain = rightChainList[0];
+		right_lower_chain = rightChainList[1];
+	}
+	else
+	{
+		right_upper_chain = rightChainList[1];
+		right_lower_chain = rightChainList[0];
+	}
+	/*
+	int left_chain_with_common_origin = leftChainList[0]->check_inclusive(commonEdge.get_origin()) ? 0 : 1;
+	int right_chain_with_common_origin = rightChainList[0]->check_inclusive(commonEdge.get_origin()) ? 0 : 1;
+	int left_chain_with_left_origin = leftChainList[0]->check_inclusive(leftEdge.get_origin()) ? 0 : 1;
+	int right_chain_with_right_origin = rightChainList[0]->check_inclusive(rightEdge.get_origin()) ? 0 : 1;
 	int common_upper_point = -1; 
 	int common_lower_point = -1;;
-
 	int upper_index, lower_index;
-
-
-
 	if (leftEdge.is_point())
 	{
 		lower_index = is_left(commonEdge.get_dest(), leftEdge.get_dest(), commonEdge.get_origin()) ? left_chain_with_common_origin : !left_chain_with_common_origin;
@@ -997,8 +1102,7 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 		lower_index = !upper_index;
 		right_upper_chain = rightChainList[upper_index];
 		right_lower_chain = rightChainList[lower_index];
-	}
-	
+	}*/
 
 	/*
 	//choose common_upper and common_lower

@@ -345,7 +345,7 @@ public:
 			return true;
 		else return false;
 	}
-	int get_point_num() {
+	int get_point_list_size() {
 		return c_point_list.size();
 	}
 	int get_last_point() {

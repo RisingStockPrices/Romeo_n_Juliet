@@ -1,0 +1,43 @@
+﻿  main.cpp
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\polygon_operation.h(84): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\polygon_decomposition.h(247): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\polygon_decomposition.h(267): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\polygon_decomposition.h(326): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\chain.h(157): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\chain.h(349): warning C4267: 'return': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(172): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(173): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(274): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(295): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(349): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(384): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(433): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(454): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(509): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\tangent.h(545): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(160): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(169): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(192): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(201): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(442): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(654): warning C4244: '=': 'point_type'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(655): warning C4244: '=': 'point_type'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(739): warning C4477: 'printf' : 서식 문자열 '%d'에 'int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'unsigned __int64'입니다.
+  c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(739): note: 서식 문자열에서 '%zd'을(를) 사용하는 것이 좋습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(744): warning C4477: 'printf' : 서식 문자열 '%d'에 'int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'unsigned __int64'입니다.
+  c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(744): note: 서식 문자열에서 '%zd'을(를) 사용하는 것이 좋습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\main.cpp(224): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\main.cpp(256): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\main.cpp(257): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\main.cpp(258): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\main.cpp(266): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\main.cpp(267): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\numeric(1160): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\polygon_decomposition.h(321): note: 컴파일 중인 함수 템플릿 인스턴스화 'void std::iota<std::_Vector_iterator<std::_Vector_val<std::_Simple_types<_Ty>>>,unsigned __int64>(_FwdIt,_FwdIt,unsigned __int64)'에 대한 참조를 확인하십시오.
+          with
+          [
+              _Ty=int,
+              _FwdIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<int>>>
+          ]
+c:\users\spock_the_wizard\desktop\dnn-master\dnn-master\dnn\spath_spolygon\project1\romeo-juliet\project1\hourglass.h(629): warning C4715: 'one_side_test': 모든 제어 경로에서 값을 반환하지는 않습니다.
+  Project1.vcxproj -> C:\Users\Spock_the_Wizard\Desktop\DNN-master\DNN-master\dnn\spath_spolygon\Project1\Romeo-Juliet\x64\Debug\Project1.exe
