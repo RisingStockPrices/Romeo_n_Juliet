@@ -37,6 +37,8 @@ public:
 		}
 	}
 	Chain(vector<int> _point_list) {
+		c_point_list = _point_list;
+		/*
 		len = 0;
 		int prev = -1;
 		int c_index = 0;
@@ -47,7 +49,7 @@ public:
 			if (i == 0) continue;
 			c_index++;
 			len += dist(c_point_list[c_index - 1], c_point_list[c_index]);
-		}
+		}*/
 	}
 	Chain(Chain * c1, Chain * c2, int p1, int p2) {
 		vector<int> v_c1 = c1->get_point_list();

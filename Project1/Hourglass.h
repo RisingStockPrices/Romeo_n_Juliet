@@ -826,6 +826,7 @@ Chain* invalid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> ri
 		piAB.insert(piAB.begin(), it, left_chain.end());
 		reverse(piAB.begin(), piAB.end());
 		piAB.pop_back();
+		reverse(piAB.begin(), piAB.end());
 	}
 
 	it = find(right_chain.begin(), right_chain.end(), right_tangent_point);
@@ -843,6 +844,8 @@ Chain* invalid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> ri
 		piCD.insert(piCD.begin(), it, right_chain.end());
 		reverse(piCD.begin(), piCD.end());
 		piCD.pop_back();
+		reverse(piCD.begin(), piCD.end());
+
 	}
 
 	tanBC = mountanizeHump(tangent, outliers, upper);
@@ -877,6 +880,7 @@ Chain* valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> righ
 		piAB.insert(piAB.begin(), it, left_chain.end());
 		reverse(piAB.begin(), piAB.end());
 		piAB.pop_back();
+		reverse(piAB.begin(), piAB.end());
 	}
 
 	it = find(right_chain.begin(), right_chain.end(), right_tangent_point);
@@ -894,6 +898,7 @@ Chain* valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> righ
 		piCD.insert(piCD.begin(), it, right_chain.end());
 		reverse(piCD.begin(), piCD.end());
 		piCD.pop_back();
+		reverse(piCD.begin(), piCD.end());//just testin'
 	}
 
 	tanBC.push_back(left_tangent_point);
@@ -1239,6 +1244,8 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	vector<int> final_lower_list = lowerChain->get_point_list();
 	vector<int>::iterator up;
 	vector<int>::iterator low;
+	vector<int> upper;
+	vector<int> lower;
 	int start, end;
 
 	if (open)//open case~
@@ -1277,8 +1284,6 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 		up = find(final_upper_list.begin(), final_upper_list.end(), start);
 		low = find(final_lower_list.begin(), final_lower_list.end(), start);
 
-		vector<int> upper;
-		vector<int> lower;
 
 		upper.insert(upper.begin(), final_upper_list.begin(), up);
 		lower.insert(lower.begin(), final_lower_list.begin(), low);
