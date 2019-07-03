@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
 	null_edge_list = vector<Edge *>();
 	init_hourglass_val();
 
-	if (read_file("input/input7.txt") == -1) return 0;
+	if (read_file("input/input10.txt") == -1) return 0;
 
 	vector<int> polygon = vector<int>(point_list.size());
 
@@ -313,7 +313,7 @@ void clear_test_points(unsigned char key, int x, int y) {
 void print_result(int argc, char **argv) {
 
 	glutInit(&argc, argv);
-	glutInitWindowPosition(0, 0);
+	glutInitWindowPosition(100, 0);
 	glutInitWindowSize(800, 800);//창 크기 설정
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutCreateWindow("Shortest Path in a simple Polygon");

@@ -705,6 +705,9 @@ vector<int> cross_the_line_check(Edge tangent, vector<int> leftP, vector<int> ri
 		}
 	}
 	return hump;
+
+
+
 	//we have to assign to -from so it goes in a left-> right order
 	//if (which_side(pointList[0], to, from))
 		//hump.push_back(pointList[0]);
@@ -826,7 +829,7 @@ Chain* invalid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> ri
 		piAB.insert(piAB.begin(), it, left_chain.end());
 		reverse(piAB.begin(), piAB.end());
 		piAB.pop_back();
-		reverse(piAB.begin(), piAB.end());
+		//reverse(piAB.begin(), piAB.end());
 	}
 
 	it = find(right_chain.begin(), right_chain.end(), right_tangent_point);
@@ -838,13 +841,14 @@ Chain* invalid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> ri
 	if (right_chain[0] == rightEdge.get_origin() || right_chain[0] == rightEdge.get_dest())
 	{
 		piCD.insert(piCD.begin(), right_chain.begin(), it);
+		reverse(piCD.begin(), piCD.end());
 	}
 	else
 	{
-		piCD.insert(piCD.begin(), it, right_chain.end());
-		reverse(piCD.begin(), piCD.end());
-		piCD.pop_back();
-		reverse(piCD.begin(), piCD.end());
+		piCD.insert(piCD.begin(), it+1, right_chain.end());
+		//reverse(piCD.begin(), piCD.end());
+		//piCD.pop_back();
+		//reverse(piCD.begin(), piCD.end());
 
 	}
 
@@ -880,7 +884,7 @@ Chain* valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> righ
 		piAB.insert(piAB.begin(), it, left_chain.end());
 		reverse(piAB.begin(), piAB.end());
 		piAB.pop_back();
-		reverse(piAB.begin(), piAB.end());
+		//reverse(piAB.begin(), piAB.end());
 	}
 
 	it = find(right_chain.begin(), right_chain.end(), right_tangent_point);
@@ -892,13 +896,14 @@ Chain* valid_outer_chains(Edge tangent, vector<int> left_chain, vector<int> righ
 	if (right_chain[0] == rightEdge.get_origin() || right_chain[0] == rightEdge.get_dest())
 	{
 		piCD.insert(piCD.begin(), right_chain.begin(), it);
+		reverse(piCD.begin(), piCD.end());
 	}
 	else
 	{
-		piCD.insert(piCD.begin(), it, right_chain.end());
-		reverse(piCD.begin(), piCD.end());
-		piCD.pop_back();
-		reverse(piCD.begin(), piCD.end());//just testin'
+		piCD.insert(piCD.begin(), it+1, right_chain.end());
+		//reverse(piCD.begin(), piCD.end());
+		//piCD.pop_back();
+		//reverse(piCD.begin(), piCD.end());//just testin'
 	}
 
 	tanBC.push_back(left_tangent_point);
@@ -966,7 +971,7 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	bool left = true;
 	Chain* chain_to_check;
 
-	if (leftEdge.is_point() && commonEdge.check_same_point(leftEdge.get_dest()))//the special case
+	if (leftEdge.is_point() && commonEdge.check_same_point(leftEdge.get_dest())!=-1)//the special case
 	{
 		which_chain_to_test = 2;
 	}
@@ -1006,7 +1011,7 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 	Chain* right_upper_chain;
 	Chain* right_lower_chain;
 
-	if (leftChainList[0]->check_inclusive(common_upper_point))
+	if (leftChainList[0]->check_inclusive(common_upper_point) && leftChainList[1]->check_inclusive(common_lower_point))
 	{
 		left_upper_chain = leftChainList[0];
 		left_lower_chain = leftChainList[1];
@@ -1016,7 +1021,7 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 		left_upper_chain = leftChainList[1];
 		left_lower_chain = leftChainList[0];
 	}
-	if (rightChainList[0]->check_inclusive(common_upper_point))
+	if (rightChainList[0]->check_inclusive(common_upper_point) && rightChainList[1]->check_inclusive(common_lower_point))
 	{
 		right_upper_chain = rightChainList[0];
 		right_lower_chain = rightChainList[1];
@@ -1260,22 +1265,26 @@ Hourglass concatenateOpenOpen(Hourglass& _left, Hourglass& _right)
 		low = final_lower_list.begin();
 		lowerS.insert(*low);
 
-		while (up != final_upper_list.end() && low != final_lower_list.end())
+		while (up != final_upper_list.end() || low != final_lower_list.end())
 		{
-			if (lowerS.find(*up) != lowerS.end())
-			{
-				start = *up;
-				break;
+			if (up != final_upper_list.end()) {
+				if (lowerS.find(*up) != lowerS.end())
+				{
+					start = *up;
+					break;
+				}
+				else
+					upperS.insert(*up);
 			}
-			else
-				upperS.insert(*up);
-			if (upperS.find(*low) != upperS.end())
-			{
-				start = *low;
-				break;
+			if (low != final_lower_list.end()) {
+				if (upperS.find(*low) != upperS.end())
+				{
+					start = *low;
+					break;
+				}
+				else
+					lowerS.insert(*low);
 			}
-			else
-				lowerS.insert(*low);
 
 			up++;
 			low++;
