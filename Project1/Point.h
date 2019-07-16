@@ -42,6 +42,15 @@ public:
 		if(reverse) return Point(id, -x, -y);
 		else return Point(id, x, y);
 	}
+
+	bool check_equal(Point _p)
+	{
+		if (x == _p.get_x() && y == _p.get_y())
+			return true;
+		else
+			return false;
+	}
+	
 };
 
 vector<Point> point_list;

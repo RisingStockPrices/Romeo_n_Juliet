@@ -84,6 +84,187 @@ Edge get_edge(int d_num) {
 	int d_size = diagonal_list.size();
 	return d_num >= d_size ? outer_edge_list[d_num - d_size] : diagonal_list[d_num];
 }
+
+// Given three colinear points p, q, r, the function checks if 
+// point q lies on line segment 'pr' 
+bool onSegment(Point p, Point q, Point r)
+{
+	point_type p_x = p.get_x(), p_y = p.get_y();
+	point_type q_x = q.get_x(), q_y = q.get_y();
+	point_type r_x = r.get_x(), r_y = r.get_y();
+
+	if (q_x <= max(p_x, r_x) && q_x >= min(p_x, r_x) &&
+		q_y <= max(p_y, r_y) && q_y >= min(p_y, r_y))
+		return true;
+
+	return false;
+}
+
+// To find orientation of ordered triplet (p, q, r). 
+// The function returns following values 
+// 0 --> p, q and r are colinear 
+// 1 --> Clockwise 
+// 2 --> Counterclockwise 
+int orientation(Point p, Point q, Point r)
+{
+	point_type p_x = p.get_x(), p_y = p.get_y();
+	point_type q_x = q.get_x(), q_y = q.get_y();
+	point_type r_x = r.get_x(), r_y = r.get_y();
+	// See https://www.geeksforgeeks.org/orientation-3-ordered-points/ 
+	// for details of below formula. 
+	int val = (q_y - p_y) * (r_x - q_x) -
+		(q_x - p_x) * (r_y - q_y);
+
+	if (val == 0) return 0; // colinear 
+
+	return (val > 0) ? 1 : 2; // clock or counterclock wise 
+}
+
+// The main function that returns true if line segment 'p1q1' 
+// and 'p2q2' intersect. 
+bool doIntersect(Point p1, Point q1, Point p2, Point q2)
+{
+	// Find the four orientations needed for general and 
+	// special cases 
+	int o1 = orientation(p1, q1, p2);
+	int o2 = orientation(p1, q1, q2);
+	int o3 = orientation(p2, q2, p1);
+	int o4 = orientation(p2, q2, q1);
+
+	// General case 
+	if (o1 != o2 && o3 != o4)
+		return true;
+
+	// Special Cases 
+	// p1, q1 and p2 are colinear and p2 lies on segment p1q1 
+	if (o1 == 0 && onSegment(p1, p2, q1)) return true;
+
+	// p1, q1 and q2 are colinear and q2 lies on segment p1q1 
+	if (o2 == 0 && onSegment(p1, q2, q1)) return true;
+
+	// p2, q2 and p1 are colinear and p1 lies on segment p2q2 
+	if (o3 == 0 && onSegment(p2, p1, q2)) return true;
+
+	// p2, q2 and q1 are colinear and q1 lies on segment p2q2 
+	if (o4 == 0 && onSegment(p2, q1, q2)) return true;
+
+	return false; // Doesn't fall in any of the above cases 
+}
+bool check_line_intersection(Point p1, Point p2, int point3, int point4)
+{
+	Point p3 = point_list[point3];
+	Point p4 = point_list[point4];
+
+	if (point3==point4)
+	{
+		return false;
+	}
+	if (p1.check_equal(p2))
+	{
+		point_type dx_a = p1.get_x() - p3.get_x();
+		point_type dx_b = p4.get_x() - p1.get_x();
+		point_type dy_a = p1.get_y() - p3.get_y();
+		point_type dy_b = p4.get_y() - p1.get_y();
+		if (dy_a == 0 && dy_b == 0)
+		{
+			if (dx_a * dx_b >= 0)
+				return true;
+			else
+				return false;
+		}
+		else {
+			if (dx_a / dy_a == dx_b / dy_b)
+				return true;
+			else
+				return false;
+		}
+	}
+	point_type ua = (p4.get_x() - p3.get_x()) * (p1.get_y() - p3.get_y()) - (p4.get_y() - p3.get_y()) * (p1.get_x() - p3.get_x());
+	point_type ub = (p2.get_x() - p1.get_x()) * (p1.get_y() - p3.get_y()) - (p2.get_y() - p1.get_y()) * (p1.get_x() - p3.get_x());
+	point_type denominator = (p4.get_y() - p3.get_y()) * (p2.get_x() - p1.get_x()) - (p4.get_x() - p3.get_x()) * (p2.get_y() - p1.get_y());
+
+	bool intersection = false;
+
+	if ((point_type)abs(denominator) >= 0.00001f)
+	{
+		ua /= denominator;
+		ub /= denominator;
+
+		if (ua > 0.0 && ua < 1.0 && ub > 0.0 && ub < 1.0)
+		{
+			intersection = true;
+			//intersectionPoint.X = point1.X + ua * (point2.X - point1.X);
+			//intersectionPoint.Y = point1.Y + ua * (point2.Y - point1.Y);
+		}
+	}
+	return intersection;
+}
+bool check_line_intersection(Point p1, Point p2, Point p3, Point p4)
+{
+	/*
+	float x1 = p1.get_x() , x2 = p2.get_x(), x3 = p3.get_x(), x4 = p4.get_x();
+	float y1 = p1.get_y(), y2 = p2.get_y(), y3 = p3.get_y(), y4 = p4.get_y();
+
+	float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+	// If d is zero, there is no intersection
+	if (d == 0) return false;
+
+	// Get the x and y
+	float pre = (x1*y2 - y1 * x2), post = (x3*y4 - y3 * x4);
+	float x = (pre * (x3 - x4) - (x1 - x2) * post) / d;
+	float y = (pre * (y3 - y4) - (y1 - y2) * post) / d;
+
+	// Check if the x and y coordinates are within both lines
+	if (x < min(x1, x2) || x > max(x1, x2) ||
+		x < min(x3, x4) || x > max(x3, x4)) return false;
+	if (y < min(y1, y2) || y > max(y1, y2) ||
+		y < min(y3, y4) || y > max(y3, y4)) return false;
+
+	// Return the point of intersection
+
+	return true;*/
+	
+	if (p1.check_equal(p2))
+	{
+		point_type dx_a = p1.get_x() - p3.get_x();
+		point_type dx_b = p4.get_x() - p1.get_x();
+		point_type dy_a = p1.get_y() - p3.get_y();
+		point_type dy_b = p4.get_y() - p1.get_y();
+		if (dy_a == 0 && dy_b == 0)
+		{
+			if (dx_a * dx_b >= 0)
+				return true;
+			else
+				return false;
+		}
+		else {
+			if (dx_a / dy_a == dx_b / dy_b)
+				return true;
+			else
+				return false;
+		}
+	}
+	point_type ua = (p4.get_x() - p3.get_x()) * (p1.get_y() - p3.get_y()) - (p4.get_y() - p3.get_y()) * (p1.get_x() - p3.get_x());
+	point_type ub = (p2.get_x() - p1.get_x()) * (p1.get_y() - p3.get_y()) - (p2.get_y() - p1.get_y()) * (p1.get_x() - p3.get_x());
+	point_type denominator = (p4.get_y() - p3.get_y()) * (p2.get_x() - p1.get_x()) - (p4.get_x() - p3.get_x()) * (p2.get_y() - p1.get_y());
+
+	bool intersection = false;
+
+	if ((point_type)abs(denominator) >= 0.00001f)
+	{
+		ua /= denominator;
+		ub /= denominator;
+
+		if (ua > 0.0 && ua < 1.0 && ub >= 0.0 && ub < 1.0)
+		{
+			intersection = true;
+			//intersectionPoint.X = point1.X + ua * (point2.X - point1.X);
+			//intersectionPoint.Y = point1.Y + ua * (point2.Y - point1.Y);
+		}
+	}
+	return intersection;
+}
+
 bool check_line_intersection(int point1, int point2, int point3, int point4) {
 	//선분 p1p2 와 선분 p3p4 가 만나는지 return
 	
@@ -91,8 +272,9 @@ bool check_line_intersection(int point1, int point2, int point3, int point4) {
 	Point p2 = point_list[point2];
 	Point p3 = point_list[point3];
 	Point p4 = point_list[point4];
-
-	if (point3 == point4)
+	
+	return check_line_intersection(p1, p2, p3, p4);
+	/*if (point3 == point4)
 	{
 		return false;
 	}
@@ -134,7 +316,7 @@ bool check_line_intersection(int point1, int point2, int point3, int point4) {
 			//intersectionPoint.Y = point1.Y + ua * (point2.Y - point1.Y);
 		}
 	}
-	return intersection;
+	return intersection;*/
 }
 // isLeft(): test if a point is Left|On|Right of an infinite line.
 //    Input:  three points P0, P1, and P2
@@ -150,6 +332,27 @@ isLeft(int p0, int p1, int p2)
 	Point P2 = point_list[p2];
 
 	return (P1.get_x() - P0.get_x())*(P2.get_y() - P0.get_y()) - (P2.get_x() - P0.get_x())*(P1.get_y() - P0.get_y());
+}
+
+bool is_strictly_left(int p0, int p1, int p2)// p1p2기준 p0가 left side에 있다., cf. cross product, determinant
+{
+	Point P0 = point_list[p0];
+	Point P1 = point_list[p1];
+	Point P2 = point_list[p2];
+
+	if ((P1.get_x() - P0.get_x())*(P2.get_y() - P0.get_y()) - (P2.get_x() - P0.get_x())*(P1.get_y() - P0.get_y()) > 0)
+		return true;
+	else return false;
+}
+bool is_strictly_right(int p0, int p1, int p2)//p1p2기준 p0가 right side 에 있다
+{
+	Point P0 = point_list[p0];
+	Point P1 = point_list[p1];
+	Point P2 = point_list[p2];
+
+	if ((P1.get_x() - P0.get_x())*(P2.get_y() - P0.get_y()) - (P2.get_x() - P0.get_x())*(P1.get_y() - P0.get_y()) < 0)
+		return true;
+	else return false;
 }
 
 bool is_left(int p0, int p1, int p2)// p1p2기준 p0가 left side에 있다., cf. cross product, determinant

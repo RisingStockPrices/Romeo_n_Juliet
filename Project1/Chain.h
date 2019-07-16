@@ -78,11 +78,12 @@ public:
 	Chain(Edge* _tan) {
 		//edge_list.push_back(_tan);
 		if (_tan->is_point()) {
-			c_point_list.push_back(_tan->get_origin());
+			
+			c_point_list.push_back(_tan->get_origin() % v_num);
 		}
 		else {
-			c_point_list.push_back(_tan->get_origin());
-			c_point_list.push_back(_tan->get_dest());
+			c_point_list.push_back(_tan->get_origin() %v_num);
+			c_point_list.push_back(_tan->get_dest() %v_num);
 		}
 		len = _tan->get_len();
 	}

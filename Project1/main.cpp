@@ -33,10 +33,6 @@ vector<Point> polygon_boundary;
 ////////////////////
 
 
-point_type max_y;
-point_type min_y;
-point_type max_x;
-point_type min_x;
 int w_h=800, w_w=800;
 
 void construct_hourglasses() {
@@ -199,13 +195,13 @@ int main(int argc, char **argv) {
 	null_edge_list = vector<Edge *>();
 	init_hourglass_val();
 
-	if (read_file("input/input10.txt") == -1) return 0;
+	if (read_file("input/input7.txt") == -1) return 0;
 
 	vector<int> polygon = vector<int>(point_list.size());
 
 	iota(polygon.begin(), polygon.end(), 0);
 	polygon_list.push_back(polygon);
-	make_big_triangle(); //여기서 point list에 의문의 점 3개가 더 추가됨
+	make_big_triangle();
 
 	for (int i = 0; i < (int)point_list.size(); i++) {
 		outer_edge_list.push_back(Edge(i, (i + 1) % point_list.size()));
@@ -234,15 +230,34 @@ int main(int argc, char **argv) {
 
 void add_test_point(int button, int state, int x, int y) {
 	if (state == GLUT_DOWN) {
+		
 		if (button == GLUT_LEFT_BUTTON) {
 			cout << x << "," << y << endl;
 			Point p(-1, x*(max_x - min_x) / w_w + min_x, (w_h - y)*(max_y - min_y) / w_h + min_y);
 			cout << "p : " << p.get_x() << "," << p.get_y() << endl;
 			int test_tri = point_state.find_triangle(p);
 			cout << "t_num" << test_tri << endl;
+			
+
+			//debug test error case
+			Point _p(-1.348, 2.4075);
+			Point _q(5.93525, 3.1425);
+
+
 			if (test_tri < (int)polygon_list.size() && (int)test_points.size()<2) {
-				test_points.push_back(p);
-				point_list.push_back(p);
+				/*test_points.push_back(_p); //p
+				point_list.push_back(_p); //p
+				test_points.push_back(_q); //p
+				point_list.push_back(_q); //p
+				*/
+				test_points.push_back(p); //p
+				point_list.push_back(p); //p
+				
+				/*
+				test_points.push_back(p); //p
+				point_list.push_back(p); //p
+				*/
+
 			}
 			if (test_points.size() == 2) {
 				selected_triangle = vector<int>();
@@ -251,6 +266,29 @@ void add_test_point(int button, int state, int x, int y) {
  					int found_triangle = point_state.find_triangle(test_points[i]);
 					selected_triangle.push_back(found_triangle);
 				}
+
+
+
+
+				/*
+
+
+				if (selected_triangle[0] == -1 || selected_triangle[1] == -1) //for easier debugging
+				{
+					printf("triangle selection error\n");
+					return;
+				}
+				else
+				{
+					printf("valid triangle selection\n");
+				}
+				*/
+				
+
+
+
+
+
 				if (selected_triangle[0] == selected_triangle[1]) {
 					final_hour = Hourglass();
 					final_hour.set_string(new String(point_list.size()-1, point_list.size()-2));
@@ -260,6 +298,7 @@ void add_test_point(int button, int state, int x, int y) {
 					return;
 				}
 				SNode * common_ancestor = find_common_ancestor(selected_triangle[0], selected_triangle[1]);
+				//SNode * common_ancestor = find_common_ancestor(2,15);
 				Hourglass origin, dest;
 				//final_hour = Hourglass();
 				
