@@ -273,7 +273,8 @@ bool check_line_intersection(int point1, int point2, int point3, int point4) {
 	Point p3 = point_list[point3];
 	Point p4 = point_list[point4];
 	
-	return check_line_intersection(p1, p2, p3, p4);
+	return doIntersect(p1, p2, p3, p4);
+	//return check_line_intersection(p1, p2, p3, p4);
 	/*if (point3 == point4)
 	{
 		return false;

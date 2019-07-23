@@ -13,6 +13,8 @@ point_type max_y;
 point_type min_y;
 point_type max_x;
 point_type min_x;
+
+point_type MAX_x;
 using namespace std;
 
 struct angle_comp {

@@ -13,7 +13,9 @@
 #include "polygon_decomposition.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <sstream>
 #include "Hourglass.h"
+
 #define NULL_HELPER -1
 #define PI 3.1415926535897931
 using namespace std;
@@ -181,10 +183,94 @@ void free_data() {
 	delete(t_list);
 }
 
+vector<Point> input_polygon;
+void white_page()
+{
+	glLoadIdentity();
+	gluOrtho2D(0, 800, 0, 800);
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glLineWidth(5);
+	glPointSize(8.0f);
+	//glEnable(GL_POINT_SMOOTH);
+
+	glBegin(GL_POINTS);
+	glColor3f(1.0, float(0.7137), float(0.7568));
+	for (int i = 0; i < input_polygon.size(); i++)
+	{
+		glVertex3f(input_polygon[i].get_x(), input_polygon[i].get_y(), 0.0);
+	}
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+	glColor3f(0.0, float(0.7137), float(0.7568));
+	for (int i = 0; i < input_polygon.size(); i++)
+	{
+		glVertex3f(input_polygon[i].get_x(), input_polygon[i].get_y(), 0.0);
+	}
+	glEnd();
+
+
+	glutSwapBuffers();
+}
+void add_polygon_points(int button, int state, int x, int y)
+{
+	float fx = x;
+	float fy = 800-y;
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		Point new_point(fx, fy);
+		input_polygon.push_back(new_point);
+		glFlush();
+	}
+
+	glutPostRedisplay();
+}
+void end_of_polygon(int key, int x, int y)
+{
+	if (key == GLUT_KEY_DOWN)
+	{
+		input_polygon.clear();
+		glutPostRedisplay();
+	}
+	if (key == GLUT_KEY_UP)//SPACEBAR
+	{
+		string filePath = "input/new_input_please_save_separately.txt";
+
+		ofstream writeFile(filePath.data());
+		if (writeFile.is_open())
+		{
+			writeFile << input_polygon.size() << endl;
+			for (int i = 0; i < input_polygon.size(); i++)
+			{
+				writeFile << input_polygon[i].get_x() << " " << input_polygon[i].get_y() << endl;
+			}
+		}
+
+		exit(10);
+	}
+}
+void add_input_file(int argc, char **argv)
+{
+	glutInit(&argc, argv);
+	glutInitWindowPosition(100, 0);
+	glutInitWindowSize(800, 800);//창 크기 설정
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutCreateWindow("Create New Input Polygon");
+	glutReshapeFunc(reshape);
+	
+	glutDisplayFunc(white_page);
+	glutMouseFunc(add_polygon_points);
+	glutSpecialFunc(end_of_polygon);
+	//glutKeyboardFunc(clear_test_points);
+	glutPostRedisplay();
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
+	glutMainLoop();
+	
+	return;
+}
 
 int main(int argc, char **argv) {
-
-
 	// initialization
 	polygon_list = vector<vector<int>>();
 	diagonal_list = vector<Edge>();
@@ -195,37 +281,63 @@ int main(int argc, char **argv) {
 	null_edge_list = vector<Edge *>();
 	init_hourglass_val();
 
-	if (read_file("input/input7.txt") == -1) return 0;
+	int menu;
+	do {
+		printf("Type '1' to add input polygon or '2' to test the input files\n");
+		scanf("%d", &menu);
+		if(menu==1)//add input files
+			add_input_file(argc, argv);
+		else if (menu==2)// find shortest path in polygon
+		{
+			printf("you have chosen to test out the program. Which input file would you like to test on? Type in the integer number only\n");
+			int number = -1;
+			scanf("%d", &number);
+			string filename;
+			stringstream s;
 
-	vector<int> polygon = vector<int>(point_list.size());
+			s << number;
 
-	iota(polygon.begin(), polygon.end(), 0);
-	polygon_list.push_back(polygon);
-	make_big_triangle();
+			filename = s.str();
 
-	for (int i = 0; i < (int)point_list.size(); i++) {
-		outer_edge_list.push_back(Edge(i, (i + 1) % point_list.size()));
-	}
-	bool  inside = true;
-	vector<Edge> new_d_list(find_monotone_polygons(polygon_list));//divides P into smaller polygons(not necessarily triangles) -> 아직 test point 안 잡음
-	diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-	new_d_list = find_monotone_polygons(outer_polygon_list);
-	outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+			filename = "input/input" + filename + ".txt";
+			if (read_file(filename) == -1) return 0;
 
-	new_d_list = triangulate_monotone_polygons(polygon_list);
-	diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-	new_d_list = triangulate_monotone_polygons(outer_polygon_list);
-	outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+			vector<int> polygon = vector<int>(point_list.size());
 
-	d_size = diagonal_list.size();
-	t_num = int(polygon_list.size());
-	dual_tree(v_num);
-	construct_hourglasses();
-	diagonal_list = vector<Edge>(diagonal_list.begin(), diagonal_list.begin() + d_size);
-	point_state = PointS();
-	while (point_state.step());
-	print_result(argc, argv);
-	return 0;
+			iota(polygon.begin(), polygon.end(), 0);
+			polygon_list.push_back(polygon);
+			make_big_triangle();
+
+			for (int i = 0; i < (int)point_list.size(); i++) {
+				outer_edge_list.push_back(Edge(i, (i + 1) % point_list.size()));
+			}
+			bool  inside = true;
+			vector<Edge> new_d_list(find_monotone_polygons(polygon_list));//divides P into smaller polygons(not necessarily triangles) -> 아직 test point 안 잡음
+			diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+			new_d_list = find_monotone_polygons(outer_polygon_list);
+			outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+
+			new_d_list = triangulate_monotone_polygons(polygon_list);
+			diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+			new_d_list = triangulate_monotone_polygons(outer_polygon_list);
+			outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+
+			d_size = diagonal_list.size();
+			t_num = int(polygon_list.size());
+			dual_tree(v_num);
+			construct_hourglasses();
+			diagonal_list = vector<Edge>(diagonal_list.begin(), diagonal_list.begin() + d_size);
+			point_state = PointS();
+			while (point_state.step());
+			print_result(argc, argv);
+			return 0;
+		}
+		else
+		{
+			printf("Type in a valid request\n");
+		}
+	} while (menu != 1 && menu != 2);
+	
 }
 
 void add_test_point(int button, int state, int x, int y) {
@@ -240,12 +352,14 @@ void add_test_point(int button, int state, int x, int y) {
 			
 
 			//debug test error case
-			Point _p(-1.348, 2.4075);
-			Point _q(5.93525, 3.1425);
+		
+			Point _p(720.395, 204.28);
+			Point _q(430.725, 400.16);
 
 
 			if (test_tri < (int)polygon_list.size() && (int)test_points.size()<2) {
-				/*test_points.push_back(_p); //p
+				/*
+				test_points.push_back(_p); //p
 				point_list.push_back(_p); //p
 				test_points.push_back(_q); //p
 				point_list.push_back(_q); //p
@@ -435,6 +549,8 @@ void display() {
 	max_x = max_element(point_list.begin(), point_list.end() - 3 - test_points.size(), [](Point &a, Point &b) {return a.get_x() < b.get_x(); })->get_x();
 	min_x = max_element(point_list.begin(), point_list.end() - 3 - test_points.size(), [](Point &a, Point &b) {return a.get_x() > b.get_x(); })->get_x();
 
+	MAX_x = max_x;
+
 	glLoadIdentity();
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -449,13 +565,28 @@ void display() {
 	glColor3f(1, float(0.7137), float(0.7568)); 
 	glBegin(GL_LINE_LOOP);
 	for (int i = 0; i < v_num; i++)
+	{
 		glVertex2d(point_list[i].get_x(), point_list[i].get_y());
+	}
 	glEnd();
 
 	//show the 3 weird points
 	glColor3f(1, 1, 0);
 	glBegin(GL_LINE_LOOP);
 	for (int i = v_num ; i < v_num + 3; i++)
+	{
+		glVertex2d(point_list[i].get_x(), point_list[i].get_y());
+	}
+	glEnd();
+
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glBegin(GL_POINTS);
+	glVertex2d(point_list[0].get_x(), point_list[0].get_y());
+	glEnd();
+
+	glColor3f(0.5f, 0.7f, 0.30f);
+	glBegin(GL_POINTS);
+	for (int i = 1; i < v_num; i++)
 	{
 		glVertex2d(point_list[i].get_x(), point_list[i].get_y());
 	}
@@ -477,6 +608,7 @@ void display() {
 	
 	
 	glColor3d(0, 0.47, 0.43);
+	
 	for (int t = 0; t <(int)test_points.size(); t++) {
 		display_point(test_points[t]);
 	}
