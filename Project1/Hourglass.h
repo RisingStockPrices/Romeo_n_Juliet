@@ -825,17 +825,18 @@ bool set_current_state(state& current_state, point_type x, point_type y, Point p
 	}
 
 }
-bool check_inclusive(vector<int> chain, int test_point)
+int check_inclusive(vector<int> chain, int test_point, int neighbor)
 {
 	Point test = point_list[test_point];
 	Point horizontal(10000, test.get_y());//MAX_x + 1, test.get_y()); //do forgive me...
+	int edge_num = -1;
 
 	if (chain.size() == 2)//동일선상에 test_point가 있을 때만 true 를 return 해야댕!!
 	{
 		if (doIntersect(test, test, point_list[chain[0]], point_list[chain[1]]))
-			return true;
+			return 0;
 		else
-			return false;
+			return -1;
 	}
 
 	chain.push_back(chain.front());
@@ -855,6 +856,10 @@ bool check_inclusive(vector<int> chain, int test_point)
 	{
 		to = point_list[chain[i + 1]];
 
+		if (neighbor == -1)
+			edge_num = 0;
+		else if (i<chain.size()-2 && check_line_intersection_closed(test_point, neighbor, chain[i], chain[i + 1]))
+			edge_num = i;
 		if (set_current_state(current_state, test_x, test_y, from, to))
 		{
 			if (previous_state == upward)
@@ -877,7 +882,6 @@ bool check_inclusive(vector<int> chain, int test_point)
 			{
 				if (previous_state == neutral && current_state == pending)
 					count++;
-
 				previous_state = current_state;
 			}
 		}
@@ -889,10 +893,14 @@ bool check_inclusive(vector<int> chain, int test_point)
 		}
 		from = to;
 	}
-	if (count % 2 == 0)
-		return false;
-	else
-		return true;
+	if (count % 2 == 0)//false
+		return -1;
+	else//true
+	{
+		if (edge_num == -1)
+			exit(11);
+		return edge_num;
+	}
 }
 /*
 bool check_inclusive(vector<int> chain, int test_point)
@@ -925,10 +933,7 @@ bool check_inclusive(vector<int> chain, int test_point)
 				count++;
 			}
 		}
-
 	}
-	
-
 	//count +=( boundary_count / 2);
 	if (count % 2 == 0)
 		return false;
@@ -976,7 +981,7 @@ vector<int> cross_the_line_check(Edge tangent, vector<int> other_side, vector<in
 	for (int i = 0; i < other_side.size(); i++)
 	{
 		if (find(pointList.begin(), pointList.end(), other_side[i])==pointList.end()) {
-			if (check_inclusive(pointList, other_side[i]))//don't call when testpoint is in chain
+			if (check_inclusive(pointList, other_side[i],-1)!=-1)//don't call when testpoint is in chain
 			{
 				hump.push_back(other_side[i]);
 			}
@@ -1068,6 +1073,9 @@ vector<int> mountanizeHump(Edge tangent, vector<int> outliers, vector<int> same_
 	vector<int> temp;
 	vector<int> boundary;
 	vector<int> mountain;
+	vector<pair<int, int>> same_side_outliers;
+	
+	int edge_num;
 	int start = tangent.is_reverse() ? tangent.get_dest() : tangent.get_origin();
 	int end = tangent.is_reverse() ? tangent.get_origin() : tangent.get_dest();
 	
@@ -1092,9 +1100,66 @@ vector<int> mountanizeHump(Edge tangent, vector<int> outliers, vector<int> same_
 				break;
 			}
 		}
-	}
+	}//boundary set
+
 	
-	return boundary;
+	int start_idx = -1, end_idx = -1;
+	//need to get the outliers from the same side that invade the boundary
+	for (int i = 0; i < same_side.size(); i++)
+	{
+		if (same_side[i] == start)
+			start_idx = i;
+		else if (same_side[i] == end)
+			end_idx = i;
+	}
+
+	for (int idx = start_idx + 1; idx < end_idx; idx++) //tangent 전후(?) 에 있는 영역만 확인하면 되는듯
+	{
+		edge_num = check_inclusive(boundary, same_side[idx], same_side[idx - 1]);
+
+		if (edge_num != -1)
+		{
+			same_side_outliers.push_back(make_pair(edge_num, same_side[idx]));
+		}
+
+	}
+
+	/*
+
+	edge_num = check_inclusive(boundary, same_side[0], same_side[1]);
+	if (edge_num != -1 && same_side[0] != start && same_side[1] != end)
+	{
+		same_side_outliers.push_back(make_pair(edge_num, same_side[0]));
+	}
+
+	for (int i = 1; i < same_side.size(); i++)
+	{
+		edge_num = check_inclusive(boundary, same_side[i], same_side[(i - 1) % same_side.size()]);
+		if (edge_num != -1 && same_side[i]!=start && same_side[i]!=end)
+		{
+			same_side_outliers.push_back(make_pair(edge_num, same_side[i]));
+		}
+	}*/
+	
+	int boundary_index = -1;
+	for (int i = 0; i < same_side_outliers.size(); i++)
+	{
+		edge_num = same_side_outliers[i].first;
+		for (int j = boundary_index+1; j <= edge_num; j++)
+		{
+			mountain.push_back(boundary[j]);
+		}
+		
+		mountain.push_back(same_side_outliers[i].second);
+		boundary_index = edge_num;
+	}
+
+	//나머지 부분들도 push!!
+	for (int i = boundary_index + 1; i < boundary.size(); i++)
+	{
+		mountain.push_back(boundary[i]);
+	}
+	return mountain;
 
 
 
@@ -1167,7 +1232,7 @@ vector<int> mountanizeHump(Edge tangent, vector<int> outliers, vector<int> same_
 	vector<int> inclusive_last;
 	for (int i = 1; i < same_side.size()-1; i++) //don't need to consider the first one (same as from)
 	{
-		if (check_inclusive(boundary, same_side[i]))
+		if (check_inclusive(boundary, same_side[i],-1)!=-1)
 		{
 			if (check_line_intersection(same_side[i - 1], same_side[i], start, first) && check_line_intersection(same_side[i], same_side[i + 1], start, first))
 			{

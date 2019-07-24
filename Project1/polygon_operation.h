@@ -265,6 +265,18 @@ bool check_line_intersection(Point p1, Point p2, Point p3, Point p4)
 	return intersection;
 }
 
+bool check_line_intersection_closed(int point1, int point2, int point3, int point4) //checks for line intersections, the lines that only share either endpoints are considered "not intersecting"
+{
+
+	Point p1 = point_list[point1];
+	Point p2 = point_list[point2];
+	Point p3 = point_list[point3];
+	Point p4 = point_list[point4];
+
+	if (point1 == point3 || point1 == point4) //only when p1 is shared
+		return false;
+	return doIntersect(p1, p2, p3, p4);
+}
 bool check_line_intersection(int point1, int point2, int point3, int point4) {
 	//선분 p1p2 와 선분 p3p4 가 만나는지 return
 	

@@ -353,8 +353,8 @@ void add_test_point(int button, int state, int x, int y) {
 
 			//debug test error case
 		
-			Point _p(720.395, 204.28);
-			Point _q(430.725, 400.16);
+			Point _p(669.56, 51.96);
+			Point _q(574.7, 210.82);
 
 
 			if (test_tri < (int)polygon_list.size() && (int)test_points.size()<2) {
@@ -557,23 +557,15 @@ void display() {
 	gluOrtho2D(min_x, max_x, min_y, max_y);
 
 	
-	glLineWidth(10);
-	glPointSize(8.0f);
+	glLineWidth(8);
+	glPointSize(5.0f);
 	glEnable(GL_POINT_SMOOTH);
 
 	
 	glColor3f(1, float(0.7137), float(0.7568)); 
+
 	glBegin(GL_LINE_LOOP);
 	for (int i = 0; i < v_num; i++)
-	{
-		glVertex2d(point_list[i].get_x(), point_list[i].get_y());
-	}
-	glEnd();
-
-	//show the 3 weird points
-	glColor3f(1, 1, 0);
-	glBegin(GL_LINE_LOOP);
-	for (int i = v_num ; i < v_num + 3; i++)
 	{
 		glVertex2d(point_list[i].get_x(), point_list[i].get_y());
 	}
