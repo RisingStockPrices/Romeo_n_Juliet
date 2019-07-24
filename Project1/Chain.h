@@ -4,6 +4,7 @@
 #include "Point.h"
 #include "Edge.h"
 #include "polygon_operation.h"
+
 using namespace std;
 class Chain {
 private:
@@ -273,7 +274,7 @@ public:
 		
 		return true;
 		//여기까지는 닿지도 않...지??ㅇㅇㅇ
-		bool check = check_line_intersection(p1, p2, common_edge->get_origin(), common_edge->get_dest());
+		bool check = check_line_intersection(p1, p2, common_edge->get_origin(), common_edge->get_dest(),false);
 		if (check) return true;
 		
 		/*int check1 = common_edge->check_same_point(p1);
@@ -356,7 +357,7 @@ public:
 	}
 	bool check_intersection(int p1, int p2) {
 		for (int i = 1; i < c_point_list.size(); i++) {
-			if (check_line_intersection(c_point_list[i - 1], c_point_list[i], p1, p2)) {
+			if (check_line_intersection(c_point_list[i - 1], c_point_list[i], p1, p2,true)) {
 				return true;
 			}
 		}

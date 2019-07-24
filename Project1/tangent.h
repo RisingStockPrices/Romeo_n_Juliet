@@ -6,8 +6,6 @@
 using namespace std;
 
 
-
-
 // tangent_PointPoly(): find any polygon's exterior tangents
 //    Input:  P = a 2D point (exterior to the polygon)
 //            n = number of polygon vertices
@@ -203,7 +201,7 @@ bool side_check(Chain * left_upper_chain, Chain * right_upper_chain, Chain * lef
 	
 	if (l2 == 0 || r2 == 0)// || (l1 == l2 && l1 != 3) || (r1 == r2 && r2 != 3))
 		return false;
-	bool check = check_line_intersection(apex1, apex2, common_edge->get_origin(), common_edge->get_dest());
+	bool check = check_line_intersection(apex1, apex2, common_edge->get_origin(), common_edge->get_dest(),true);
 	
 	if (check)
 		return true;

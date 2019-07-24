@@ -6,6 +6,8 @@
 #include "Edge.h"
 #include "Tree.h"
 #include "VertexID.h"
+
+
 #define NULL_HELPER -1
 #define PI 3.1415926535897931
 using namespace std;
@@ -120,9 +122,23 @@ int orientation(Point p, Point q, Point r)
 	return (val > 0) ? 1 : 2; // clock or counterclock wise 
 }
 
+float dot_product(int v1_p1, int v1_p2, int v2_p1, int v2_p2)
+{
+
+	Point v1 = Point(v1_p1, v1_p2);
+	Point v2 = Point(v2_p1, v2_p2);
+
+	float v1_x = v1.get_x();
+	float v2_x = v2.get_x();
+	float v1_y = v1.get_y();
+	float v2_y = v2.get_y();
+
+	return v1_x * v2_x + v1_y * v2_y;
+}
+
 // The main function that returns true if line segment 'p1q1' 
 // and 'p2q2' intersect. 
-bool doIntersect(Point p1, Point q1, Point p2, Point q2)
+bool check_line_intersection_open(Point p1, Point q1, Point p2, Point q2)
 {
 	// Find the four orientations needed for general and 
 	// special cases 
@@ -150,80 +166,10 @@ bool doIntersect(Point p1, Point q1, Point p2, Point q2)
 
 	return false; // Doesn't fall in any of the above cases 
 }
-bool check_line_intersection(Point p1, Point p2, int point3, int point4)
+
+bool check_line_intersection_closed(Point p1, Point p2, Point p3, Point p4)
 {
-	Point p3 = point_list[point3];
-	Point p4 = point_list[point4];
-
-	if (point3==point4)
-	{
-		return false;
-	}
-	if (p1.check_equal(p2))
-	{
-		point_type dx_a = p1.get_x() - p3.get_x();
-		point_type dx_b = p4.get_x() - p1.get_x();
-		point_type dy_a = p1.get_y() - p3.get_y();
-		point_type dy_b = p4.get_y() - p1.get_y();
-		if (dy_a == 0 && dy_b == 0)
-		{
-			if (dx_a * dx_b >= 0)
-				return true;
-			else
-				return false;
-		}
-		else {
-			if (dx_a / dy_a == dx_b / dy_b)
-				return true;
-			else
-				return false;
-		}
-	}
-	point_type ua = (p4.get_x() - p3.get_x()) * (p1.get_y() - p3.get_y()) - (p4.get_y() - p3.get_y()) * (p1.get_x() - p3.get_x());
-	point_type ub = (p2.get_x() - p1.get_x()) * (p1.get_y() - p3.get_y()) - (p2.get_y() - p1.get_y()) * (p1.get_x() - p3.get_x());
-	point_type denominator = (p4.get_y() - p3.get_y()) * (p2.get_x() - p1.get_x()) - (p4.get_x() - p3.get_x()) * (p2.get_y() - p1.get_y());
-
-	bool intersection = false;
-
-	if ((point_type)abs(denominator) >= 0.00001f)
-	{
-		ua /= denominator;
-		ub /= denominator;
-
-		if (ua > 0.0 && ua < 1.0 && ub > 0.0 && ub < 1.0)
-		{
-			intersection = true;
-			//intersectionPoint.X = point1.X + ua * (point2.X - point1.X);
-			//intersectionPoint.Y = point1.Y + ua * (point2.Y - point1.Y);
-		}
-	}
-	return intersection;
-}
-bool check_line_intersection(Point p1, Point p2, Point p3, Point p4)
-{
-	/*
-	float x1 = p1.get_x() , x2 = p2.get_x(), x3 = p3.get_x(), x4 = p4.get_x();
-	float y1 = p1.get_y(), y2 = p2.get_y(), y3 = p3.get_y(), y4 = p4.get_y();
-
-	float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-	// If d is zero, there is no intersection
-	if (d == 0) return false;
-
-	// Get the x and y
-	float pre = (x1*y2 - y1 * x2), post = (x3*y4 - y3 * x4);
-	float x = (pre * (x3 - x4) - (x1 - x2) * post) / d;
-	float y = (pre * (y3 - y4) - (y1 - y2) * post) / d;
-
-	// Check if the x and y coordinates are within both lines
-	if (x < min(x1, x2) || x > max(x1, x2) ||
-		x < min(x3, x4) || x > max(x3, x4)) return false;
-	if (y < min(y1, y2) || y > max(y1, y2) ||
-		y < min(y3, y4) || y > max(y3, y4)) return false;
-
-	// Return the point of intersection
-
-	return true;*/
-	
+		
 	if (p1.check_equal(p2))
 	{
 		point_type dx_a = p1.get_x() - p3.get_x();
@@ -263,21 +209,9 @@ bool check_line_intersection(Point p1, Point p2, Point p3, Point p4)
 		}
 	}
 	return intersection;
-}
+} //doIntersect 로 없앨 수 있는듯
 
-bool check_line_intersection_closed(int point1, int point2, int point3, int point4) //checks for line intersections, the lines that only share either endpoints are considered "not intersecting"
-{
-
-	Point p1 = point_list[point1];
-	Point p2 = point_list[point2];
-	Point p3 = point_list[point3];
-	Point p4 = point_list[point4];
-
-	if (point1 == point3 || point1 == point4) //only when p1 is shared
-		return false;
-	return doIntersect(p1, p2, p3, p4);
-}
-bool check_line_intersection(int point1, int point2, int point3, int point4) {
+bool check_line_intersection(int point1, int point2, int point3, int point4, bool boundary_included) {
 	//선분 p1p2 와 선분 p3p4 가 만나는지 return
 	
 	Point p1 = point_list[point1];
@@ -285,51 +219,13 @@ bool check_line_intersection(int point1, int point2, int point3, int point4) {
 	Point p3 = point_list[point3];
 	Point p4 = point_list[point4];
 	
-	return doIntersect(p1, p2, p3, p4);
-	//return check_line_intersection(p1, p2, p3, p4);
-	/*if (point3 == point4)
+	if(boundary_included)
+		return check_line_intersection_open(p1, p2, p3, p4);
+	else
 	{
-		return false;
+		return check_line_intersection_closed(p1, p2, p3, p4);
 	}
-	if (point1 == point2)
-	{
-		point_type dx_a = p1.get_x()-p3.get_x();
-		point_type dx_b = p4.get_x()-p1.get_x();
-		point_type dy_a = p1.get_y()-p3.get_y();
-		point_type dy_b = p4.get_y()-p1.get_y();
-		if (dy_a == 0 && dy_b == 0)
-		{
-			if (dx_a * dx_b >= 0)
-				return true;
-			else
-				return false;
-		}
-		else {
-			if (dx_a / dy_a == dx_b / dy_b)
-				return true;
-			else
-				return false;
-		}
-	}
-	point_type ua = (p4.get_x() - p3.get_x()) * (p1.get_y() - p3.get_y()) - (p4.get_y() - p3.get_y()) * (p1.get_x() - p3.get_x());
-	point_type ub = (p2.get_x() - p1.get_x()) * (p1.get_y() - p3.get_y()) - (p2.get_y() - p1.get_y()) * (p1.get_x() - p3.get_x());
-	point_type denominator = (p4.get_y() - p3.get_y()) * (p2.get_x() - p1.get_x()) - (p4.get_x() - p3.get_x()) * (p2.get_y() - p1.get_y());
 
-	bool intersection = false;
-
-	if ((point_type)abs(denominator) >= 0.00001f)
-	{
-		ua /= denominator;
-		ub /= denominator;
-
-		if (ua > 0.0 && ua < 1.0 && ub > 0.0 && ub < 1.0)
-		{
-			intersection = true;
-			//intersectionPoint.X = point1.X + ua * (point2.X - point1.X);
-			//intersectionPoint.Y = point1.Y + ua * (point2.Y - point1.Y);
-		}
-	}
-	return intersection;*/
 }
 // isLeft(): test if a point is Left|On|Right of an infinite line.
 //    Input:  three points P0, P1, and P2
@@ -345,27 +241,6 @@ isLeft(int p0, int p1, int p2)
 	Point P2 = point_list[p2];
 
 	return (P1.get_x() - P0.get_x())*(P2.get_y() - P0.get_y()) - (P2.get_x() - P0.get_x())*(P1.get_y() - P0.get_y());
-}
-
-bool is_strictly_left(int p0, int p1, int p2)// p1p2기준 p0가 left side에 있다., cf. cross product, determinant
-{
-	Point P0 = point_list[p0];
-	Point P1 = point_list[p1];
-	Point P2 = point_list[p2];
-
-	if ((P1.get_x() - P0.get_x())*(P2.get_y() - P0.get_y()) - (P2.get_x() - P0.get_x())*(P1.get_y() - P0.get_y()) > 0)
-		return true;
-	else return false;
-}
-bool is_strictly_right(int p0, int p1, int p2)//p1p2기준 p0가 right side 에 있다
-{
-	Point P0 = point_list[p0];
-	Point P1 = point_list[p1];
-	Point P2 = point_list[p2];
-
-	if ((P1.get_x() - P0.get_x())*(P2.get_y() - P0.get_y()) - (P2.get_x() - P0.get_x())*(P1.get_y() - P0.get_y()) < 0)
-		return true;
-	else return false;
 }
 
 bool is_left(int p0, int p1, int p2)// p1p2기준 p0가 left side에 있다., cf. cross product, determinant
@@ -388,8 +263,70 @@ bool is_right(int p0, int p1, int p2)//p1p2기준 p0가 right side 에 있다
 		return true;
 	else return false;
 }
+bool all_left(vector<int> chain, int from, int to)
+{
+	for (int i = 0; i < chain.size(); i++)
+	{
+		if (!is_left(chain[i], from, to))
+			return false;
+	}
+	return true;
+}
+bool all_right(vector<int> chain, int from, int to)
+{
+	for (int i = 0; i < chain.size(); i++)
+	{
+		if (!is_right(chain[i], from, to))
+			return false;
+	}
+	return true;
+}
 
+int connect_vectors(vector<int> left_list, vector<int> right_list, vector<int>& result_list)
+{
+	int samePoint = -1;
 
+	//both lists should not be empty
+	if (left_list.empty() || right_list.empty())
+	{
+		exit(11);
+	}
+	if (left_list.back() == right_list.front())
+	{
+		samePoint = left_list.back();
+		left_list.pop_back();
+	}
+	else if (left_list.back() == right_list.back())
+	{
+		samePoint = left_list.back();
+		right_list.pop_back();
+		reverse(right_list.begin(), right_list.end());
+
+	}
+	else if (left_list.front() == right_list.front())
+	{
+		samePoint = left_list.front();
+		reverse(left_list.begin(), left_list.end());
+		left_list.pop_back();
+
+	}
+	else if (left_list.front() == right_list.back())
+	{
+		samePoint = left_list.front();
+		reverse(left_list.begin(), left_list.end());
+		reverse(right_list.begin(), right_list.end());
+		left_list.pop_back();
+
+	}
+	else {
+		return -1;
+		exit(7); //this shouldn't happen
+	}
+	left_list.insert(left_list.end(), right_list.begin(), right_list.end());
+
+	result_list = left_list;
+	return samePoint;
+}
 
 // tests for polygon vertex ordering relative to a fixed point P
 #define above(P,Vi,Vj)  (isLeft(P,Vi,Vj) >= 0)   // true if Vi is above Vj

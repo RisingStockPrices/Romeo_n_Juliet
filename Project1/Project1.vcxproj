@@ -149,8 +149,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Chain.h" />
+    <ClInclude Include="DebugPrint.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="Hourglass.h" />
+    <ClInclude Include="hourglass_operation.h" />
     <ClInclude Include="NODE.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="PointS.h" />

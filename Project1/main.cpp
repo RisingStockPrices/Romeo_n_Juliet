@@ -14,7 +14,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <sstream>
-#include "Hourglass.h"
+#include "hourglass_operation.h"
 
 #define NULL_HELPER -1
 #define PI 3.1415926535897931
