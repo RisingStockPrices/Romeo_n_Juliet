@@ -282,9 +282,13 @@ bool all_right(vector<int> chain, int from, int to)
 	return true;
 }
 
-int connect_vectors(vector<int> left_list, vector<int> right_list, vector<int>& result_list)
+int connect_vectors(vector<int>& left_list, vector<int>& right_list, vector<int>& concatenated_list)
 {
-	int samePoint = -1;
+	/*
+		@brief: concatenates _left and _right list with the common point appearing once in the concatenated_list, also reverses the left and right lists if needed(reference type)
+		@return: the index of the common point in the concatenated list
+	*/
+	int common_point_index = left_list.size() - 1;
 
 	//both lists should not be empty
 	if (left_list.empty() || right_list.empty())
@@ -293,39 +297,32 @@ int connect_vectors(vector<int> left_list, vector<int> right_list, vector<int>& 
 	}
 	if (left_list.back() == right_list.front())
 	{
-		samePoint = left_list.back();
 		left_list.pop_back();
 	}
 	else if (left_list.back() == right_list.back())
 	{
-		samePoint = left_list.back();
-		right_list.pop_back();
+		left_list.pop_back();
 		reverse(right_list.begin(), right_list.end());
-
 	}
 	else if (left_list.front() == right_list.front())
 	{
-		samePoint = left_list.front();
 		reverse(left_list.begin(), left_list.end());
 		left_list.pop_back();
-
 	}
 	else if (left_list.front() == right_list.back())
 	{
-		samePoint = left_list.front();
 		reverse(left_list.begin(), left_list.end());
 		reverse(right_list.begin(), right_list.end());
 		left_list.pop_back();
-
 	}
 	else {
-		return -1;
-		exit(7); //this shouldn't happen
+		return -1;		
 	}
-	left_list.insert(left_list.end(), right_list.begin(), right_list.end());
-
-	result_list = left_list;
-	return samePoint;
+	concatenated_list.insert(concatenated_list.end(), left_list.begin(), left_list.end());
+	concatenated_list.insert(concatenated_list.end(), right_list.begin(), right_list.end());
+	left_list.push_back(concatenated_list[common_point_index]);
+	
+	return common_point_index;
 }
 
 // tests for polygon vertex ordering relative to a fixed point P

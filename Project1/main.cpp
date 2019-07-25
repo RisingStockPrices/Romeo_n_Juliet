@@ -228,12 +228,14 @@ void add_polygon_points(int button, int state, int x, int y)
 }
 void end_of_polygon(int key, int x, int y)
 {
-	if (key == GLUT_KEY_DOWN)
-	{
+	if (key == GLUT_KEY_DOWN) //delete all the points
 		input_polygon.clear();
-		glutPostRedisplay();
+	else if (key == GLUT_KEY_LEFT) //delete a single point
+	{
+		if (!input_polygon.empty())
+			input_polygon.pop_back();
 	}
-	if (key == GLUT_KEY_UP)//SPACEBAR
+	else if (key == GLUT_KEY_UP)//save!
 	{
 		string filePath = "input/new_input_please_save_separately.txt";
 
@@ -249,6 +251,8 @@ void end_of_polygon(int key, int x, int y)
 
 		exit(10);
 	}
+
+	glutPostRedisplay();
 }
 void add_input_file(int argc, char **argv)
 {
@@ -300,37 +304,40 @@ int main(int argc, char **argv) {
 			filename = s.str();
 
 			filename = "input/input" + filename + ".txt";
-			if (read_file(filename) == -1) return 0;
+			if (read_file(filename) != -1) {
 
-			vector<int> polygon = vector<int>(point_list.size());
+				vector<int> polygon = vector<int>(point_list.size());
 
-			iota(polygon.begin(), polygon.end(), 0);
-			polygon_list.push_back(polygon);
-			make_big_triangle();
+				iota(polygon.begin(), polygon.end(), 0);
+				polygon_list.push_back(polygon);
+				make_big_triangle();
 
-			for (int i = 0; i < (int)point_list.size(); i++) {
-				outer_edge_list.push_back(Edge(i, (i + 1) % point_list.size()));
+				for (int i = 0; i < (int)point_list.size(); i++) {
+					outer_edge_list.push_back(Edge(i, (i + 1) % point_list.size()));
+				}
+				bool  inside = true;
+				vector<Edge> new_d_list(find_monotone_polygons(polygon_list));//divides P into smaller polygons(not necessarily triangles) -> 아직 test point 안 잡음
+				diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+				new_d_list = find_monotone_polygons(outer_polygon_list);
+				outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+
+				new_d_list = triangulate_monotone_polygons(polygon_list);
+				diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+				new_d_list = triangulate_monotone_polygons(outer_polygon_list);
+				outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+
+				d_size = diagonal_list.size();
+				t_num = int(polygon_list.size());
+				dual_tree(v_num);
+				construct_hourglasses();
+				diagonal_list = vector<Edge>(diagonal_list.begin(), diagonal_list.begin() + d_size);
+				point_state = PointS();
+				while (point_state.step());
+				print_result(argc, argv);
+				return 0;
 			}
-			bool  inside = true;
-			vector<Edge> new_d_list(find_monotone_polygons(polygon_list));//divides P into smaller polygons(not necessarily triangles) -> 아직 test point 안 잡음
-			diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-			new_d_list = find_monotone_polygons(outer_polygon_list);
-			outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-
-			new_d_list = triangulate_monotone_polygons(polygon_list);
-			diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-			new_d_list = triangulate_monotone_polygons(outer_polygon_list);
-			outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-
-			d_size = diagonal_list.size();
-			t_num = int(polygon_list.size());
-			dual_tree(v_num);
-			construct_hourglasses();
-			diagonal_list = vector<Edge>(diagonal_list.begin(), diagonal_list.begin() + d_size);
-			point_state = PointS();
-			while (point_state.step());
-			print_result(argc, argv);
-			return 0;
+			system("cls");
+			menu = 3;
 		}
 		else
 		{
@@ -377,32 +384,9 @@ void add_test_point(int button, int state, int x, int y) {
 				selected_triangle = vector<int>();
 				sequence_diagonal = vector<int>();
 				for (int i = 0; i < (int)test_points.size(); i++) {
- 					int found_triangle = point_state.find_triangle(test_points[i]);
+					int found_triangle = point_state.find_triangle(test_points[i]);
 					selected_triangle.push_back(found_triangle);
 				}
-
-
-
-
-				/*
-
-
-				if (selected_triangle[0] == -1 || selected_triangle[1] == -1) //for easier debugging
-				{
-					printf("triangle selection error\n");
-					return;
-				}
-				else
-				{
-					printf("valid triangle selection\n");
-				}
-				*/
-				
-
-
-
-
-
 				if (selected_triangle[0] == selected_triangle[1]) {
 					final_hour = Hourglass();
 					final_hour.set_string(new String(point_list.size()-1, point_list.size()-2));
