@@ -34,6 +34,7 @@ PointS point_state;
 vector<Point> polygon_boundary;
 ////////////////////
 
+void find_shortest_path();
 
 int w_h=800, w_w=800;
 
@@ -273,9 +274,36 @@ void add_input_file(int argc, char **argv)
 	
 	return;
 }
+void preprocess_polygon()
+{
+	vector<int> polygon = vector<int>(point_list.size());
 
+	iota(polygon.begin(), polygon.end(), 0);
+	polygon_list.push_back(polygon);
+	make_big_triangle();
+
+	for (int i = 0; i < (int)point_list.size(); i++) {
+		outer_edge_list.push_back(Edge(i, (i + 1) % point_list.size()));
+	}
+	bool  inside = true;
+	vector<Edge> new_d_list(find_monotone_polygons(polygon_list));//divides P into smaller polygons(not necessarily triangles) -> 아직 test point 안 잡음
+	diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+	new_d_list = find_monotone_polygons(outer_polygon_list);
+	outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+
+	new_d_list = triangulate_monotone_polygons(polygon_list);
+	diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+	new_d_list = triangulate_monotone_polygons(outer_polygon_list);
+	outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
+
+	d_size = diagonal_list.size();
+	t_num = int(polygon_list.size());
+	dual_tree(v_num);
+	construct_hourglasses();
+	diagonal_list = vector<Edge>(diagonal_list.begin(), diagonal_list.begin() + d_size);
+	
+}
 int main(int argc, char **argv) {
-	// initialization
 	polygon_list = vector<vector<int>>();
 	diagonal_list = vector<Edge>();
 	outer_diagonal_list = vector<Edge>();
@@ -306,34 +334,12 @@ int main(int argc, char **argv) {
 			filename = "input/input" + filename + ".txt";
 			if (read_file(filename) != -1) {
 
-				vector<int> polygon = vector<int>(point_list.size());
-
-				iota(polygon.begin(), polygon.end(), 0);
-				polygon_list.push_back(polygon);
-				make_big_triangle();
-
-				for (int i = 0; i < (int)point_list.size(); i++) {
-					outer_edge_list.push_back(Edge(i, (i + 1) % point_list.size()));
-				}
-				bool  inside = true;
-				vector<Edge> new_d_list(find_monotone_polygons(polygon_list));//divides P into smaller polygons(not necessarily triangles) -> 아직 test point 안 잡음
-				diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-				new_d_list = find_monotone_polygons(outer_polygon_list);
-				outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-
-				new_d_list = triangulate_monotone_polygons(polygon_list);
-				diagonal_list.insert(diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-				new_d_list = triangulate_monotone_polygons(outer_polygon_list);
-				outer_diagonal_list.insert(outer_diagonal_list.end(), new_d_list.begin(), new_d_list.end());
-
-				d_size = diagonal_list.size();
-				t_num = int(polygon_list.size());
-				dual_tree(v_num);
-				construct_hourglasses();
-				diagonal_list = vector<Edge>(diagonal_list.begin(), diagonal_list.begin() + d_size);
+				preprocess_polygon();
 				point_state = PointS();
+			
 				while (point_state.step());
 				print_result(argc, argv);
+
 				return 0;
 			}
 			system("cls");
@@ -347,6 +353,52 @@ int main(int argc, char **argv) {
 	
 }
 
+Hourglass find_shortest_path(vector<Point> test_points) //input : two test points , returns final hourglass(string) representing shortest path of the two points
+{
+	selected_triangle = vector<int>();
+	sequence_diagonal = vector<int>();
+	for (int i = 0; i < (int)test_points.size(); i++) {
+		int found_triangle = point_state.find_triangle(test_points[i]);
+		selected_triangle.push_back(found_triangle);
+	}
+	Hourglass final_hourglass;
+	if (selected_triangle[0] == selected_triangle[1]) {
+		final_hourglass.set_string(new String(point_list.size() - 1, point_list.size() - 2));
+		final_hourglass.set_first_edge(Edge(point_list.size() - 1));
+		final_hourglass.set_second_edge(Edge(point_list.size() - 2));
+		glutPostRedisplay();
+		return final_hourglass;
+	}
+	SNode * common_ancestor = find_common_ancestor(selected_triangle[0], selected_triangle[1]);
+	Hourglass origin, dest;
+
+	origin = construct_hourglass_point(point_list.size() - 1, sequence_diagonal.front());
+	dest = construct_hourglass_point(point_list.size() - 2, sequence_diagonal.back());
+	if (sequence_diagonal.size() == 1) {
+		final_hourglass = concatenate_hourglasses(origin, dest);
+	}
+	else if (sequence_diagonal.size() >= 2) {
+		int h_num = s_graph[sequence_diagonal[0]][sequence_diagonal[1]];
+		h_num = (h_num == -1) ? s_graph[sequence_diagonal[1]][sequence_diagonal[0]] : h_num;
+		final_hourglass = hourglass_list[h_num];
+
+		Hourglass temp;
+		for (int i = 2; i < (int)sequence_diagonal.size(); i++) {
+			int d_1 = sequence_diagonal[i - 1];
+			int d_2 = sequence_diagonal[i];
+			int h_num = s_graph[d_1][d_2];
+			h_num = (h_num == -1) ? s_graph[d_2][d_1] : h_num;
+			temp = hourglass_list[h_num];
+			final_hourglass = concatenate_hourglasses(temp, final_hourglass);
+		}
+		final_hourglass = concatenate_hourglasses(origin, final_hourglass);
+		final_hourglass = concatenate_hourglasses(final_hourglass, dest);
+	}
+	for (int i = 0; i<2; i++)
+		diagonal_list.pop_back();
+
+	return final_hourglass;
+}
 void add_test_point(int button, int state, int x, int y) {
 	if (state == GLUT_DOWN) {
 		
@@ -356,85 +408,23 @@ void add_test_point(int button, int state, int x, int y) {
 			cout << "p : " << p.get_x() << "," << p.get_y() << endl;
 			int test_tri = point_state.find_triangle(p);
 			cout << "t_num" << test_tri << endl;
-			
-
-			//debug test error case
-		
-			Point _p(669.56, 51.96);
-			Point _q(574.7, 210.82);
-
 
 			if (test_tri < (int)polygon_list.size() && (int)test_points.size()<2) {
-				/*
-				test_points.push_back(_p); //p
-				point_list.push_back(_p); //p
-				test_points.push_back(_q); //p
-				point_list.push_back(_q); //p
-				*/
-				test_points.push_back(p); //p
-				point_list.push_back(p); //p
-				
-				/*
-				test_points.push_back(p); //p
-				point_list.push_back(p); //p
-				*/
-
+				test_points.push_back(p);
+				point_list.push_back(p); 
 			}
-			if (test_points.size() == 2) {
-				selected_triangle = vector<int>();
-				sequence_diagonal = vector<int>();
-				for (int i = 0; i < (int)test_points.size(); i++) {
-					int found_triangle = point_state.find_triangle(test_points[i]);
-					selected_triangle.push_back(found_triangle);
-				}
-				if (selected_triangle[0] == selected_triangle[1]) {
-					final_hour = Hourglass();
-					final_hour.set_string(new String(point_list.size()-1, point_list.size()-2));
-					final_hour.set_first_edge(Edge(point_list.size() - 1));
-					final_hour.set_second_edge(Edge(point_list.size() - 2));
-					glutPostRedisplay();
-					return;
-				}
-				SNode * common_ancestor = find_common_ancestor(selected_triangle[0], selected_triangle[1]);
-				//SNode * common_ancestor = find_common_ancestor(2,15);
-				Hourglass origin, dest;
-				//final_hour = Hourglass();
-				
-				origin = construct_hourglass_point(point_list.size() - 1, sequence_diagonal.front());
-				dest = construct_hourglass_point(point_list.size() - 2, sequence_diagonal.back());
-				if (sequence_diagonal.size() == 1) {
-					final_hour = concatenate_hourglasses(origin, dest);
-				}else if(sequence_diagonal.size() >=2) {
-					int h_num = s_graph[sequence_diagonal[0]][sequence_diagonal[1]];
-					h_num = (h_num == -1) ? s_graph[sequence_diagonal[1]][sequence_diagonal[0]] : h_num;
-					final_hour = hourglass_list[h_num];
 
-					Hourglass temp;
-					for (int i = 2; i < (int)sequence_diagonal.size(); i++) {
-						int d_1 = sequence_diagonal[i - 1];
-						int d_2 = sequence_diagonal[i];
-						int h_num = s_graph[d_1][d_2];
-						h_num = (h_num == -1) ? s_graph[d_2][d_1] : h_num;
-						temp = hourglass_list[h_num];
-						final_hour = concatenate_hourglasses(temp, final_hour);
-						
-					}
-					final_hour = concatenate_hourglasses(origin, final_hour);
-					final_hour = concatenate_hourglasses(final_hour, dest);
-				}
-				for (int i = 0; i<2; i++)
-					diagonal_list.pop_back();
-			}
-			
+			if (test_points.size() == 2)
+				final_hour = find_shortest_path(test_points); // RETURNS SINGLE FINAL HOURGLASS FOR THE TWO POINTS IN THE INPUT VECTOR
+
 			glutPostRedisplay();
 		}
 	}
 
 }
 void clear_test_points() {
-	for (int i = 0; i < (int)test_points.size(); i++) {
+	for (int i = 0; i < (int)test_points.size(); i++)
 		point_list.pop_back();
-	}
 	test_points = vector<Point>();
 	selected_triangle = vector<int>();
 	sequence_diagonal = vector<int>();
@@ -576,12 +566,10 @@ void display() {
 		display_edge(diagonal_list[i]);
 	}
 	
-	glColor3f(1.0f, 0.0f, 1.0f);//principle diagonals?? -diags it's separating
+	glColor3f(1.0f, 0.0f, 1.0f);
 	for (int i = 0; i < (int)sequence_diagonal.size(); i++) {
 		display_edge(diagonal_list[sequence_diagonal[i]]);
 	}
-	
-	
 	
 	glColor3d(0, 0.47, 0.43);
 	
@@ -614,9 +602,6 @@ void display() {
 	
 	glutSwapBuffers();
 	return;
-
-
-
 
 	/*glBegin(GL_LINE_LOOP);
 	for (int i = 0; i < 3; i++)
