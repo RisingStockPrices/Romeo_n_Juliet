@@ -30,11 +30,13 @@ int d_size;
 Hourglass final_hour;
 PointS point_state;
 
+Hourglass test_hourglass;
+
 ////////////////////
 vector<Point> polygon_boundary;
 ////////////////////
 
-void find_shortest_path();
+Hourglass find_shortest_path(vector<Point> test_points);
 
 int w_h=800, w_w=800;
 
@@ -59,7 +61,6 @@ bool findPath(SNode * root, vector<SNode *> &path, SNode * k)
 	path.push_back(root);
 
 	// See if the k is same as root's key 
-	
 
 	// Check if k is found in left or right sub-tree 
 	if ((root->get_left_children() && findPath(root->get_left_children(), path, k)) ||
@@ -100,7 +101,7 @@ Triangle * find_common_triangle(Triangle *t1, Triangle *t2) {
 			break;
 	return path1[i - 1];
 }
-SNode * find_common_ancestor(int _t1, int _t2) {
+SNode * find_common_ancestor(int _t1, int _t2) {//input: triangle where the test_points are located
 	// to store paths to n1 and n2 from the root 
 	vector<SNode *> path1, path2;
 
@@ -299,7 +300,9 @@ void preprocess_polygon()
 	d_size = diagonal_list.size();
 	t_num = int(polygon_list.size());
 	dual_tree(v_num);
+
 	construct_hourglasses();
+
 	diagonal_list = vector<Edge>(diagonal_list.begin(), diagonal_list.begin() + d_size);
 	
 }
@@ -557,8 +560,6 @@ void display() {
 		glVertex2d(point_list[i].get_x(), point_list[i].get_y());
 	}
 	glEnd();
-
-
 
 	glLineWidth(3);//every diagonal
 	glColor3f(float(0.6), float(0.6), float(0.6));
