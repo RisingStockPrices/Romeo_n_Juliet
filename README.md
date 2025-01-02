@@ -4,7 +4,7 @@ On Romeo and Juliet Problems: Minimizing Distance-to-Sight
 
 Press 1 to add your input polygon file and 2 to test your polygon.
 
-<1: Adding Input Polygon Mode>
+## 1: Adding Input Polygon Mode
 Click to add vertices in your polygon.
 Make sure there are no LOOPS!
 If you made a mistake, press the left arrow key to delete the most recently added vertex.
@@ -16,7 +16,7 @@ In order to test your polygon, you must rename the file with the form "inputNN.t
 example) "input32.txt", "input2.txt" (o), "input_2.txt"(x)
 
 
-<2: Testing Polygon Mode>
+## 2: Testing Polygon Mode
 Type in an integer number corresponding to the input file you wish to test out. 
 If you would like to test out the file "input53.txt", then type in '53' and press enter.
 Once the polygon appears, click to add test points.
